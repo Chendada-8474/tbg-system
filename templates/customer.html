@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div>
+            <h1 class="h2">顧客資訊</h1>
+            <a href="/{{trip_id}}">回到行程資訊</a>
+        </div>
+        <a href="/{{trip_id}}/new-customer"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增成員</button></a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for c in cus_info %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="card-title">{{c[0].first_name}} {{c[0].last_name}}</h3>
+                    <p><span class="fw-bold">Gender: </span>{{ c[0].gender }}</p>
+                    <p><span class="fw-bold">Phone Number: </span>{{ c[0].phone_number }}</p>
+                    <p><span class="fw-bold">Email Address: </span>{{ c[0].email }}</p>
+                    <p><span class="fw-bold">Birthday: </span>{{ c[0].birthday }}</p>
+                    <p><span class="fw-bold">ID: </span>{{ c[0].id_number }}</p>
+                    <p><span class="fw-bold">Passport No.: </span>{{ c[0].passport_no }}</p>
+                    <p><span class="fw-bold">Address: </span>{{c[0].address}}</p>
+                    <p><span class="fw-bold">Country: </span>{{c[1].country_name}}</p>
+                    <p><span class="fw-bold">Note: </span>{{c[0].note}}</p>
+                    <div class="d-flex flex-wrap">
+                        <a class="mb-2 me-2" href="/edit-customer/{{ c[0].customer_id }}">
+                            <button type="button" type="submit" class="btn btn-primary">
+                                <span data-feather="edit" class="align-text-bottom"></span> 編輯
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

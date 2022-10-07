@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div>
+            <h1 class="h2">編輯顧客資訊</h1>
+            <h5>{{ cus_info.first_name }} {{ cus_info.last_name }}</h5>
+        </div>
+    </div>
+
+    {% if update_done %}
+    <div class="alert alert-success" role="alert">
+        所有變更已儲存，<a href="/{{trip_id}}">回到行程資訊</a>，<a href="/{{trip_id}}/customer">回到顧客資訊</a>
+    </div>
+    {% endif %}
+    {% if cus_form.errors %}
+    <div class="alert alert-danger" role="alert">
+        {{ cus_form.errors }}
+        請聯絡系統開發人員，如果是時間格是錯誤，這好像是 flask wtform 的 bug ，只要再選一次時間就可以了。
+    </div>
+    {% endif %}
+
+
+    <form action="" , method="POST">
+        {{ cus_form.hidden_tag() }}
+        {{ cus_form.csrf_token }}
+
+        <div class="shadow-sm bg-light p-3 mb-3 rounded-2 h-100">
+
+            <div class="row pt-1 pb-2 mb-3">
+                <div class="col-lg-2">
+                    {{ cus_form.first_name.label(class="form-label") }}
+                    {{ cus_form.first_name(class="form-control", value=cus_info.first_name) }}
+                </div>
+                <div class="col-lg-2">
+                    {{ cus_form.last_name.label(class="form-label") }}
+                    {{ cus_form.last_name(class="form-control", value=cus_info.last_name) }}
+                </div>
+                <div class="col-lg-1">
+                    {{ cus_form.gender.label(class="form-label") }}
+                    {{ cus_form.gender(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ cus_form.country.label(class="form-label") }}
+                    {{ cus_form.country(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ cus_form.phone_number.label(class="form-label") }}
+                    {{ cus_form.phone_number(class="form-control", value=cus_info.phone_number) }}
+                </div>
+                <div class="col-lg-3">
+                    {{ cus_form.email.label(class="form-label") }}
+                    {{ cus_form.email(class="form-control", value=cus_info.email) }}
+                </div>
+            </div>
+            <div class="row pt-1 pb-2 mb-3">
+                <div class="col-lg-6">
+                    {{ cus_form.address.label(class="form-label") }}
+                    {{ cus_form.address(class="form-control", value=cus_info.address) }}
+                </div>
+                <div class="col-lg-2">
+                    {{ cus_form.id_number.label(class="form-label") }}
+                    {{ cus_form.id_number(class="form-control", value=cus_info.id_number) }}
+                </div>
+                <div class="col-lg-2">
+                    {{ cus_form.passport_no.label(class="form-label") }}
+                    {{ cus_form.passport_no(class="form-control", value=cus_info.passport_no) }}
+                </div>
+                <div class="col-lg-2">
+                    {{ cus_form.birthday.label(class="form-label") }}
+                    {{ cus_form.birthday(class="form-control", value=cus_info.birthday) }}
+                </div>
+            </div>
+            <div class="row pt-1 pb-2 mb-3">
+                <div class="col-lg--12">
+                    {{ cus_form.note.label(class="form-label") }}
+                    {{ cus_form.note(class="form-control") }}
+                </div>
+            </div>
+        </div>
+
+        {{ cus_form.update_cus(class="btn btn-primary mb-3") }}
+    </form>
+
+    <div class="shadow-sm alert alert-danger p-3">
+        <h4 class="pb-3">Danger Zone</h4>
+        <!-- Button trigger modal -->
+
+
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            刪除顧客資訊
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header text-body">
+                        <h5 class="modal-title" id="exampleModalLabel">確定要刪除顧客資訊嗎？</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-body">
+                        這個動作會從資料庫上永久刪除此顧客的所有資料，確定要繼續嗎？
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <form action="/customer-deleted={{ cus_info.customer_id }}" , method="POST">
+                            <button type="submit" class="btn btn-danger" name="delete_buttom" value="delete">刪除</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

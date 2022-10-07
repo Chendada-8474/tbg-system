@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">TBG 成員資訊</h1>
+        <a href="{{ url_for('new_partner') }}"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增成員</button></a>
+
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for p in partners %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{p.ch_last_name}}{{p.ch_first_name}} ({{p.first_name}} {{p.last_name}}) #{{p.partner_id}}</h5>
+                    {% if p.admin == 1 %}
+                    <div class="d-flex">
+                        <p class="bg-info rounded-5 text-white px-2">administrator</p>
+                    </div>
+                    {% endif %}
+                    <p><span class="fw-bold">English Name: </span>{{ p.en_first_name }}</p>
+                    <p><span class="fw-bold">Phone Number: </span>{{ p.phone_number }}</p>
+                    <p><span class="fw-bold">Email Address: </span>{{ p.email }}</p>
+                    <p><span class="fw-bold">Birthday: </span>{{ p.birthday }}</p>
+                    <p><span class="fw-bold">ID: </span>{{ p.id_number }}</p>
+                    <p><span class="fw-bold">Address: </span>{{p.zip_code}} {{ p.current_address }}</p>
+                    <p><span class="fw-bold">Google Drive Url: </span><a target="_blank" href="{{ p.gdrive_url }}">{{ p.gdrive_url }}</a></p>
+                    <a href="/edit-partner/{{ p.partner_id }}"><button type="button" class="btn btn-primary">編輯資訊</button></a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

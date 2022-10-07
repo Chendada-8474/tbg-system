@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">新增團員</h1>
+    </div>
+    {% if form_err %}
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+            <use xlink:href="#exclamation-triangle-fill" />
+        </svg>
+        <div>
+            error: {{ form_err }}
+        </div>
+    </div>
+    <p>請聯絡系統開發人員</p>
+    {% else %}
+    <div class="alert alert-success" role="alert">
+        <p class="mb-2">顧客新增成功</p>
+        <br>
+        <a href="/{{ trip_id }}">回到行程資訊</a>
+        <br>
+        <a href="/{{ trip_id }}/customer">回到顧客資訊</a>
+    </div>
+    {% endif %}
+</main>
+</div>
+</div>
+
+
+{% endblock %}

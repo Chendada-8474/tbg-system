@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">新增支出項目</h1>
+    </div>
+
+    {% if update_done %}
+    <div class="alert alert-success" role="alert">
+        支出項目已經成功增加，<a href="/{{trip_id}}">回到行程資訊</a>
+    </div>
+    {% endif %}
+
+    <form action="" method="POST">
+        {{ exp_form.csrf_token }}
+        {{ exp_form.hidden_tag() }}
+
+        <div class="row pt-1 pb-2 mb-3">
+            <div class="row py-2">
+                <div class="col-lg-2">
+                    {{exp_form.item_id.label(class="form-label")}}
+                    {{exp_form.item_id(class="form-control")}}
+                </div>
+                <div class="col-lg-2">
+                    {{exp_form.unit_price.label(class="form-label")}}
+                    {{exp_form.unit_price(class="form-control")}}
+                </div>
+                <div class="col-lg-1">
+                    {{exp_form.quantity.label(class="form-label")}}
+                    {{exp_form.quantity(class="form-control")}}
+                </div>
+                <div class="col-lg-2">
+                    {{exp_form.date.label(class="form-label")}}
+                    {{exp_form.date(class="form-control")}}
+                </div>
+                <div class="col-lg-2">
+                    {{exp_form.advancer.label(class="form-label")}}
+                    {{exp_form.advancer(class="form-control")}}
+                </div>
+            </div>
+            <div class="row py-2">
+                <div class="col-lg-9">
+                    {{exp_form.note.label(class="form-label")}}
+                    {{exp_form.note(class="form-control")}}
+                </div>
+            </div>
+
+        </div>
+
+
+        {{exp_form.create_expenditure(class="btn btn-primary")}}
+        {{exp_form.errors}}
+    </form>
+
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

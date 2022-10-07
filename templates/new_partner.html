@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">新增成員</h1>
+    </div>
+
+    <form action="/partner" method="POST">
+        {{ partner_form.hidden_tag() }}
+        {{ partner_form.csrf_token }}
+        <div class="shadow-sm bg-light p-3 mb-3 rounded-2 h-100">
+            <div class="row mb-3">
+                <div class="col-lg-3">
+                    {{ partner_form.first_name.label(class="form-label") }}
+                    {{ partner_form.first_name(class="form-control") }}
+                </div>
+                <div class="col-lg-3">
+                    {{ partner_form.last_name.label(class="form-label") }}
+                    {{ partner_form.last_name(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ partner_form.ch_first_name.label(class="form-label") }}
+                    {{ partner_form.ch_first_name(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ partner_form.ch_last_name.label(class="form-label") }}
+                    {{ partner_form.ch_last_name(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ partner_form.en_first_name.label(class="form-label") }}
+                    {{ partner_form.en_first_name(class="form-control") }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-4">
+                    {{ partner_form.phone_number.label(class="form-label") }}
+                    {{ partner_form.phone_number(class="form-control") }}
+                </div>
+                <div class="col-lg-4">
+                    {{ partner_form.email.label(class="form-label") }}
+                    {{ partner_form.email(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ partner_form.id_number.label(class="form-label") }}
+                    {{ partner_form.id_number(class="form-control") }}
+                </div>
+                <div class="col-lg-2">
+                    {{ partner_form.birthday.label(class="form-label") }}
+                    {{ partner_form.birthday(class="form-control") }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-lg-1">
+                    {{ partner_form.zip_code.label(class="form-label") }}
+                    {{ partner_form.zip_code(class="form-control") }}
+                </div>
+                <div class="col-lg-4">
+                    {{ partner_form.current_address.label(class="form-label") }}
+                    {{ partner_form.current_address(class="form-control") }}
+                </div>
+                <div class="col-lg-7">
+                    {{ partner_form.gdrive_url.label(class="form-label") }}
+                    {{ partner_form.gdrive_url(class="form-control") }}
+                </div>
+
+            </div>
+        </div>
+        {{ partner_form.add_partner(class="btn btn-primary") }}
+    </form>
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

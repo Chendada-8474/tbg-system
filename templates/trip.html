@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <!-- <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{trip_info[0][1].first_name}} {{trip_info[0][1].last_name}} {{ trip_info[0][0].starting_date }}</h1>
+    </div> -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{trip_info[0][1].first_name}} {{trip_info[0][1].last_name}} {{ trip_info[0][0].number_of_days }} days ({{ trip_info[0][3].country_name }})</h1>
+
+        <div>
+            <div class="btn-group m-1" role="group" aria-label="Basic example">
+                <form action="" method="post">
+                    <button type="submit" name="progress_button" class="btn btn-secondary" value="back">上一步</button>
+                    <button type="submit" name="progress_button" class="btn btn-success" value="next">下一步</button>
+                </form>
+            </div>
+            <a href="/edit-trip/{{trip_id}}" class="m-1">
+                <button type="button" type="submit" class="btn btn-primary">編輯行程資訊</button>
+            </a>
+            <a href="">
+                <button type="button" class="btn btn-success m-1">下載估價單</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap">
+        {% if cancel == 0 %}
+        <p class="bg-success bg-opacity-25 rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .50;">draft</p>
+        <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
+        <p class="{% if trip_info[0][0].to_quote == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .60;">quote sent</p>
+        <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
+        <p class="{% if trip_info[0][0].deposit == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .70;">got deposit</p>
+        <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
+        <p class="{% if trip_info[0][0].pay_off == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .80;">paid off</p>
+        <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
+        <p class="{% if trip_info[0][0].trip_end == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .90;">trip finished</p>
+        <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
+        <p class="{% if trip_info[0][0].accounted == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1">reimbursed</p>
+        {% else %}
+        <p class="bg-danger rounded-5 text-white px-2 m-1">cancelled</p>
+        {% endif %}
+
+    </div>
+
+    <div class="row pt-1 pb-2 mb-3">
+        <div class="col-lg-8">
+            <div class="shadow-sm bg-light p-3 h-100 rounded-2">
+                <h4>Basic Information</h4>
+
+                <div class="row py-2">
+                    <div class="col-lg-3">
+                        <h6 class="fw-bolder">Contact Customer</h6>
+                        <p>{{trip_info[0][1].first_name}} {{trip_info[0][1].last_name}}</p>
+                    </div>
+                    <div class="col-lg-3">
+                        <h6 class="fw-bolder">Start Date</h6>
+                        <p>{{ trip_info[0][0].starting_date }}</p>
+                    </div>
+                    <div class="col-lg-3">
+                        <h6 class="fw-bolder">Days</h6>
+                        <p>{{ trip_info[0][0].number_of_days }}</p>
+                    </div>
+                    <div class="col-lg-3">
+                        <h6 class="fw-bolder">Number of Tourists</h6>
+                        <p>{{ trip_info[0][0].number_of_tourists }}</p>
+                    </div>
+                </div>
+
+                <div>
+                    <p><span class="fw-bold">Contact Email: </span>
+                        {% if trip_info[0][1].email %}
+                        <a href="mailto:{{ trip_info[0][1].email }}">{{ trip_info[0][1].email }}</a>
+                        {% endif %}
+                    </p>
+                    <p><span class="fw-bold">Cost: </span>{{ trip_info[0][0].cost }} {{ trip_info[0][0].currency }}</p>
+                    <p><span class="fw-bold">Exchange Rate: </span>{{ trip_info[0][0].exchange_rate }}</p>
+                    <p><span class="fw-bold">Pick up: </span>{{ trip_info[0][0].pick_up_location }} {{trip_info[0][0].pick_up_time}}</p>
+                    <p><span class="fw-bold">Trip End: </span>{{ trip_info[0][0].end_location }}</p>
+                    <p><span class="fw-bold">Vehicle: </span>{{ trip_info[0][2].seat }}-seats {{ trip_info[0][2].brand }} {{ trip_info[0][2].model }}</p>
+                    <p><span class="fw-bold">eBird Trip Report: </span>
+                        {% if trip_info[0][0].ebird_trip_id %}
+                        <a target="_blank" href="https://ebird.org/tripreport/{{ trip_info[0][0].ebird_trip_id }}">https://ebird.org/tripreport/{{ trip_info[0][0].ebird_trip_id }}</a>
+                        {% else %}
+                        還沒整理賞鳥紀行，快去整理吧~
+                        {% endif %}
+                    </p>
+                    <p><span class="fw-bold">HackMD Trip Document: </span>
+                        {% if trip_info[0][0].hackmd_note_id %}
+                        <a target="_blank" href="https://hackmd.io/{{ trip_info[0][0].hackmd_note_id }}">https://hackmd.io/{{ trip_info[0][0].hackmd_note_id }}</a>
+                        {% endif %}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="shadow-sm bg-light p-3 h-100 rounded-2">
+                <h4 class="pb-3">TBG Partner</h4>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill"><span data-feather="flag" class="align-text-bottom"></span> Guide</span>
+                        {{ crew["guide"] }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill"><span data-feather="life-buoy" class="align-text-bottom"></span> Driver</span>
+                        {{ crew["driver"] }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill"><span data-feather="user" class="align-text-bottom"></span> Manager</span>
+                        {{ crew["manager"] }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill"><span data-feather="smile" class="align-text-bottom"></span> Sales</span>
+                        {{ crew["sales"] }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill"><span data-feather="dollar-sign" class="align-text-bottom"></span> Accountant</span>
+                        {{ crew["accountant"] }}
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill"><span data-feather="list" class="align-text-bottom"></span> Route Control</span>
+                        {{ crew["route_control"] }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-3 pb-2 mb-3">
+        <div class="col-lg-3">
+            <div class="shadow-sm bg-light p-3 h-100 rounded-2">
+                <h4 class="pb-3">Rooms for Customer</h4>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Single Room
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].single_room }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Twin Room
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].twin_room }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Double Room
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].double_room }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Triple Room
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].triple_room }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Quadruple Room
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].quadruple_room }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Other Room
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].other_room }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="shadow-sm bg-light p-3 h-100 rounded-2">
+                <h4 class="pb-3">Payment</h4>
+                <p><span class="fw-bold">A/C Name: </span>{{ trip_info[0][4].account_name }}</p>
+                <p><span class="fw-bold">Bank Chinese Name: </span>{{ trip_info[0][4].bank_ch_name }}</p>
+                <p><span class="fw-bold">Bank English Name: </span>{{ trip_info[0][4].bank_en_name }}</p>
+                <p><span class="fw-bold">Branch Bank: </span>{{ trip_info[0][4].branch }}</p>
+                <p><span class="fw-bold">A/C No. : </span>
+                    {{ trip_info[0][4].account_number }} ({{ trip_info[0][0].currency }})
+                </p>
+                <p><span class="fw-bold">Swift Code : </span>
+                    {{ trip_info[0][4].swift_code }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-3 pb-2 mb-3">
+        <div class="shadow-sm bg-light p-3">
+            <div class="d-flex flex-wrap justify-content-between">
+                <h4 class="pb-3">Participating Customer</h4>
+                <a href="/{{trip_id}}/customer"><button type="button" class="btn btn-primary"><span data-feather="users" class="align-text-bottom"></span> 顧客詳細資訊</button></a>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Age</th>
+                        <th scope="col">Country</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in parti %}
+                    <tr>
+                        <th scope="row">{{p[0]}}</th>
+                        <td>{{p[1]}}</td>
+                        <td>{{p[2]}}</td>
+                        <td>{{p[3]}}</td>
+                        <td>{{p[4]}}</td>
+                        <td class="text-center">
+                            <a href="/edit-customer/{{ p[0] }}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row pt-3 pb-2 mb-3">
+        <div class="shadow-sm bg-light p-3">
+            <div class="d-flex flex-wrap justify-content-between">
+                <h4 class="pb-3">支出明細表</h4>
+                <a href="/{{trip_id}}/new-expenditure"><button type="button" class="btn btn-primary"><span data-feather="file-plus" class="align-text-bottom"></span> 增加項目</button></a>
+            </div>
+            <table class="table table-striped table-hover mb-3">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">項目</th>
+                        <th scope="col">單價</th>
+                        <th scope="col">數量</th>
+                        <th scope="col">總價</th>
+                        <th scope="col">日期</th>
+                        <th scope="col">代墊人</th>
+                        <th scope="col">備註</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in expend %}
+                    <tr>
+                        <th scope="row">{{ e[0].expenditure_id }}</th>
+                        <td>{{ e[1].item_name }}</td>
+                        <td>{{ e[0].unit_price }}</td>
+                        <td>{{ e[0].quantity }}</td>
+                        <td>{{ e[0].quantity * e[0].unit_price }}</td>
+                        <td>{{ e[0].date }}</td>
+                        <td>{{ e[2].ch_last_name }}{{e[2].ch_first_name}}</td>
+                        <td>{{ e[0].note }}</td>
+                        <td class="text-center">
+                            <a href="/{{trip_id}}/edit-expenditure/{{e[0].expenditure_id}}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="d-flex flex-wrap">
+                {% if trip_info[0][0].accounted == 1 %}
+                {% if profit %}
+                <h5 class="m-3">總支出: <span>{{total_expand}} TWD</span></h5>
+                <h5 class="m-3">利潤: <span class="{% if profit > 0 %}text-success{% elif profit < 0 %}text-danger{% else %}text-warning{% endif %}">{{profit}} TWD</span></h5>
+                {% else %}
+                <p>尚未輸入匯率</p>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row pt-3 pb-2 mb-3">
+
+        <form action="" method="post">
+            <div class="mb-3">
+                {% if cancel == 0 %}
+                <button type="submit" name="progress_button" class="btn btn-warning" value="cancel">取消行程</button>
+                {% else %}
+                <button type="submit" name="progress_button" class="btn btn-warning" value="uncancel">恢復行程</button>
+                {% endif %}
+            </div>
+        </form>
+
+        <div class="shadow-sm alert alert-danger p-3">
+            <h4 class="pb-3">Danger Zone</h4>
+            <!-- Button trigger modal -->
+
+
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                刪除行程
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header text-body">
+                            <h5 class="modal-title" id="exampleModalLabel">確定要刪除行程嗎？</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-body">
+                            這個動作會從資料庫上永久刪除這個行程的所有資料，確定要繼續嗎？
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <form action="/trip-deleted={{ trip_id }}" , method="POST">
+                                <button type="submit" class="btn btn-danger" name="progress_button" value="delete">刪除</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}
