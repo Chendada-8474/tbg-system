@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">新增住宿</h1>
+    </div>
+    {% if update_done %}
+    <div class="alert alert-success" role="alert">
+        住宿已經成功增加，<a href="{{ url_for('accommodation')}}">回到住宿頁面</a>
+    </div>
+    {% endif %}
+
+    <form action="" method="POST">
+        {{ accomm_form.hidden_tag() }}
+        {{ accomm_form.csrf_token }}
+        <div class="row pt-1 pb-2 mb-3">
+            <div class="row py-2">
+                <div class="col-lg-4">
+                    {{accomm_form.accommodation_name.label(class="form-label")}}
+                    {{accomm_form.accommodation_name(class="form-control")}}
+                </div>
+                <div class="col-lg-4">
+                    {{accomm_form.accommodation_ch_name.label(class="form-label")}}
+                    {{accomm_form.accommodation_ch_name(class="form-control")}}
+                </div>
+                <div class="col-lg-2">
+                    {{accomm_form.phone_number.label(class="form-label")}}
+                    {{accomm_form.phone_number(class="form-control")}}
+                </div>
+                <div class="col-lg-2">
+                    {{accomm_form.county_id.label(class="form-label")}}
+                    {{accomm_form.county_id(class="form-control")}}
+                </div>
+
+            </div>
+
+            <div class="row py-2">
+                <div class="col-lg-6">
+                    {{accomm_form.address.label(class="form-label")}}
+                    {{accomm_form.address(class="form-control")}}
+                </div>
+                <div class="col-lg-6">
+                    {{accomm_form.ch_address.label(class="form-label")}}
+                    {{accomm_form.ch_address(class="form-control")}}
+                </div>
+            </div>
+
+            <div class="row py-2">
+                <div class="col-lg-2">
+                    {{accomm_form.elevation.label(class="form-label")}}
+                    {{accomm_form.elevation(class="form-control")}}
+                </div>
+            </div>
+
+            <div class="row py-2">
+                <div class="col-lg-2">
+                    {{accomm_form.wifi(class="form-check-input")}}
+                    {{accomm_form.wifi.label(class="form-check-label")}}
+                </div>
+            </div>
+
+            <div class="row py">
+                <div class="col-lg-12">
+                    {{accomm_form.note.label(class="form-label")}}
+                    {{accomm_form.note(class="form-control", rows='3')}}
+                </div>
+            </div>
+        </div>
+        {{accomm_form.create_accommodation(class="btn btn-primary")}}
+    </form>
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

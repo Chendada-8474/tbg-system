@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+<style>
+    .one-schedule {
+        float: left;
+    }
+
+    .add-schedule {
+        border-color: rgba(0, 0, 0, 0.175);
+        background-color: rgb(239, 239, 239);
+    }
+
+    .add-schedule:hover {
+        border-color: rgba(0, 0, 0, 0.175);
+        background-color: rgb(203, 203, 203);
+    }
+
+    .delete-schedule {
+        padding: 0.1rem 0.2rem;
+        border: none;
+    }
+</style>
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">新增行程</h1>
+        <div>
+            <button type="button" id="add-day" class='btn btn-primary'>新增天數</button>
+            <button type="button" id="reorder" class='btn btn-primary'>重新整理天數</button>
+        </div>
+    </div>
+
+    <form id="itineraryForm" action="" method="POST">
+        <div id="days">
+            <div id="day1" class="shadow-sm bg-light p-3 rounded-2 my-3">
+
+                <h4 class="my-3">Day 1</h4>
+                <div class="d-flex flex-wrap">
+
+                    <div class="schedule my-3 d-flex">
+                        <div id="schedule1" class="one-schedule card me-3">
+                            <div class="card-header">
+                                #1
+                                <button type="button" class="float-end delete-schedule btn btn-outline-secondary" disabled><span data-feather="trash-2"></span></button>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">篩選</p>
+                                <select class="form-select form-select-sm mb-2 filter" name="spot_type_id">
+                                    <option value="">-- 地點類型 --</option>
+                                    {% for s in spot_type_selction %}
+                                    <option value="{{ s[0] }}">{{ s[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select class="form-select form-select-sm mb-4 filter" name="county_id">
+                                    <option value="">-- 縣市 --</option>
+                                    {% for c in county_selction %}
+                                    <option value="{{ c[0] }}">{{ c[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <p class="card-text fw-bolder">地點</p>
+                                <select class="form-select form-select-sm spot" name="spot_id">
+                                    <option value="">-- 請選擇地點 --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <button type="button" class="ms-3 my-3 btn add-schedule p-5"><span data-feather="plus" class="align-text-bottom me-1"></span></button>
+
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-2">
+                        <p>篩選</p>
+                        <select name="county_id" class="form-select form-select-sm filter_accommodation">
+                            <option value="">-- 縣市 --</option>
+                            {% for c in county_selction %}
+                            <option value="{{ c[0] }}">{{ c[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-2">
+                        <p class="fw-bolder">住宿</p>
+                        <select name="accommodation_id" class="form-select form-select-sm accommodation">
+                            <option value=15>-- TBA --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-danger btn-sm delete-day" disabled>刪除這一天</button>
+
+                <input type="hidden" name="number_of_schedule" value="1">
+
+            </div>
+
+        </div>
+        <button type="submit" class="btn btn-primary" name="submit_buttom" value="new_itinerary">Submit</button>
+    </form>
+
+</main>
+
+
+
+
+<script src="{{ url_for('static', filename='js/itinerary_days.js')}}"></script>
+
+{% endblock %}

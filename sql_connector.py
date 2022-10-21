@@ -2,8 +2,8 @@ from sqlalchemy import create_engine, desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql.expression import func
-from datetime import date, datetime
-
+from datetime import date
+import pandas as pd
 
 engine = create_engine(
     "mysql+pymysql://root:ro2231031@192.168.1.104:3306/taiwanbirdguide"
@@ -54,6 +54,42 @@ class BankAccount(Base):
 
 class Currency(Base):
     __table__ = Base.metadata.tables["currency"]
+
+
+class Spot(Base):
+    __table__ = Base.metadata.tables["spot"]
+
+
+class SpotType(Base):
+    __table__ = Base.metadata.tables["spot_type"]
+
+
+class KeySpecies(Base):
+    __table__ = Base.metadata.tables["key_species"]
+
+
+class SpeciesSpot(Base):
+    __table__ = Base.metadata.tables["species_spot"]
+
+
+class Accommodation(Base):
+    __table__ = Base.metadata.tables["accommodation"]
+
+
+class Itinerary(Base):
+    __table__ = Base.metadata.tables["itinerary"]
+
+
+class ItineraryTitle(Base):
+    __table__ = Base.metadata.tables["itinerary_title"]
+
+
+class ItineraryAccommodation(Base):
+    __table__ = Base.metadata.tables["itinerary_accommodation"]
+
+
+class County(Base):
+    __table__ = Base.metadata.tables["county"]
 
 
 def get_index_table(limit=5):
@@ -679,20 +715,226 @@ def insert_expenditure(exp_from, trip_id: int):
     db_session.commit()
 
 
-def expenditure_summary(exp_info, trip_info):
-    total_expend = 0
+def get_itinerary_info():
+    itinerary = (
+        db_session.query(ItineraryTitle)
+        .order_by(desc(ItineraryTitle.itinerary_id))
+        .all()
+    )
+    return itinerary
 
-    try:
-        for i in exp_info:
-            total_expend += i[0].unit_price * i[0].quantity
-        profit = trip_info[0][0].cost * trip_info[0][0].exchange_rate - total_expend
-    except:
-        total_expend = None
-        profit = None
 
-    return total_expend, profit
+def get_one_itinerary(itin_id: int):
+    itinerary = (
+        db_session.query(Itinerary, Spot)
+        .join(Spot, Itinerary.spot_id == Spot.spot_id)
+        .filter(Itinerary.itinerary_id == itin_id)
+        .all()
+    )
+
+    first_day = 0
+    for i, j in enumerate(itinerary):
+        if j[0].day != first_day:
+            first_day = j[0].day
+            row = list(j)
+            row.append(True)
+            row = tuple(row)
+        else:
+            row = list(j)
+            row.append(False)
+            row = tuple(row)
+        itinerary[i] = row
+
+    return itinerary
+
+
+def get_itinerary_title(itin_id: int):
+    title = (
+        db_session.query(ItineraryTitle)
+        .filter(ItineraryTitle.itinerary_id == itin_id)
+        .first()
+    )
+    return title
+
+
+def get_itinerary_accommodation(itin_id: int):
+    accom = (
+        db_session.query(ItineraryAccommodation, Accommodation)
+        .join(
+            Accommodation,
+            ItineraryAccommodation.accommodation_id == Accommodation.accommodation_id,
+        )
+        .filter(ItineraryAccommodation.itinerary_id == itin_id)
+        .all()
+    )
+    return accom
+
+
+def get_spot():
+    spot = db_session.query(Spot).all()
+    return spot
+
+
+def get_species():
+    species = db_session.query(KeySpecies).all()
+    return species
+
+
+def get_accommodation_with_county():
+    accommodation = (
+        db_session.query(Accommodation, County)
+        .join(County, County.county_id == Accommodation.county_id)
+        .all()
+    )
+    return accommodation
+
+
+def get_spot_type_selection():
+    types = db_session.query(SpotType).all()
+    types = [(i.spot_type_id, i.type) for i in types]
+    return types
+
+
+def get_one_spot(spot_id):
+    spot = db_session.query(Spot).filter(Spot.spot_id == spot_id).first()
+    return spot
+
+
+def get_one_spot_spottype(spot_id):
+    spot = (
+        db_session.query(Spot, SpotType)
+        .join(SpotType, SpotType.spot_type_id == Spot.spot_type_id)
+        .filter(Spot.spot_id == spot_id)
+        .first()
+    )
+    return spot
+
+
+def get_spot_type():
+    types = db_session.query(SpotType).all()
+    return types
+
+
+def get_spot_with_tpye_county():
+    spot = (
+        db_session.query(Spot, SpotType, County)
+        .join(SpotType, SpotType.spot_type_id == Spot.spot_type_id)
+        .join(County, County.county_id == Spot.county_id)
+        .all()
+    )
+
+    return spot
+
+
+def get_spot_species(spot_id):
+    species = (
+        db_session.query(SpeciesSpot, KeySpecies)
+        .join(KeySpecies, KeySpecies.key_species_id == SpeciesSpot.key_species_id)
+        .filter(SpeciesSpot.spot_id == spot_id)
+        .all()
+    )
+    return species
+
+
+def update_spot(spot_id, form):
+    db_session.query(Spot).filter(Spot.spot_id == spot_id).update(
+        {
+            "spot_name": form.spot_name.data,
+            "spot_ch_name": form.spot_ch_name.data,
+            "longitude": form.longitude.data,
+            "latitude": form.latitude.data,
+            "spot_type_id": form.spot_type_id.data,
+            "description": form.description.data,
+            "winter": form.winter.data,
+            "spring": form.spring.data,
+            "summer": form.summer.data,
+            "autumn": form.autumn.data,
+        }
+    )
+    db_session.commit()
+
+
+def insert_spot(form):
+    new_spot = Spot(
+        spot_name=form.spot_name.data,
+        spot_ch_name=form.spot_ch_name.data,
+        longitude=form.longitude.data,
+        latitude=form.latitude.data,
+        spot_type_id=form.spot_type_id.data,
+        description=form.description.data,
+        winter=form.winter.data,
+        spring=form.spring.data,
+        summer=form.summer.data,
+        autumn=form.autumn.data,
+    )
+    db_session.add(new_spot)
+    db_session.commit()
+
+
+def get_county_selection():
+    county = db_session.query(County).all()
+    county = [(i.county_id, i.county_ch_name) for i in county]
+    return county
+
+
+def get_one_accommodation(accommodation_id):
+    accommodation = (
+        db_session.query(Accommodation)
+        .filter(Accommodation.accommodation_id == accommodation_id)
+        .first()
+    )
+    return accommodation
+
+
+def get_accommodation_live():
+    accommodation = db_session.query(
+        Accommodation.accommodation_id,
+        Accommodation.accommodation_ch_name,
+        Accommodation.county_id,
+    ).all()
+    return accommodation
+
+
+def update_accommodation(accommodation_id, form):
+    db_session.query(Accommodation).filter(
+        Accommodation.accommodation_id == accommodation_id
+    ).update(
+        {
+            "accommodation_name": form.accommodation_name.data,
+            "accommodation_ch_name": form.accommodation_ch_name.data,
+            "address": form.address.data,
+            "ch_address": form.ch_address.data,
+            "phone_number": form.phone_number.data,
+            "wifi": form.wifi.data,
+            "county_id": form.county_id.data,
+            "elevation": form.elevation.data,
+            "note": form.note.data,
+        }
+    )
+    db_session.commit()
+
+
+def insert_accommodation(form):
+    new_accommodation = Accommodation(
+        accommodation_name=form.accommodation_name.data,
+        accommodation_ch_name=form.accommodation_ch_name.data,
+        address=form.address.data,
+        ch_address=form.ch_address.data,
+        phone_number=form.phone_number.data,
+        wifi=form.wifi.data,
+        county_id=form.county_id.data,
+        elevation=form.elevation.data,
+        note=form.note.data,
+    )
+    db_session.add(new_accommodation)
+    db_session.commit()
+
+
+def insert_an_itinerary(itinerary_response: dict):
+
+    pass
 
 
 if __name__ == "__main__":
-
-    print()
+    query = get_accommodation_live()
+    print(query)

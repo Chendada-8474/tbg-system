@@ -1,4 +1,5 @@
 from email.policy import default
+from pydoc import describe
 from flask_wtf import FlaskForm
 from wtforms import Form as BaseForm
 from wtforms import (
@@ -13,6 +14,7 @@ from wtforms import (
     FieldList,
     FormField,
     EmailField,
+    BooleanField,
 )
 
 from wtforms.validators import DataRequired, NumberRange, Email, Optional
@@ -23,6 +25,8 @@ from sql_connector import (
     get_currency_selection,
     get_country,
     get_item_selection,
+    get_spot_type_selection,
+    get_county_selection,
 )
 
 
@@ -353,3 +357,63 @@ def expenditure_form(item_def=None, advancer_def=None):
         update_expenditure = SubmitField("儲存變更")
 
     return ExpenditureForm()
+
+
+def spot_form(
+    spot_type_def=1,
+    description_def=None,
+    winter_def=False,
+    spring_def=False,
+    summer_def=False,
+    autumn_def=False,
+):
+    spot_types = get_spot_type_selection()
+
+    class SpotForm(FlaskForm):
+        spot_name = StringField("English Spot Name", validators=[DataRequired()])
+        spot_ch_name = StringField("Chinese Spot Name", validators=[DataRequired()])
+        longitude = FloatField(
+            "Longitude", validators=[Optional(strip_whitespace=True)]
+        )
+        latitude = FloatField("Latitude", validators=[Optional(strip_whitespace=True)])
+        description = TextAreaField(
+            "Description",
+            default=description_def,
+            validators=[Optional(strip_whitespace=True)],
+        )
+        spot_type_id = SelectField(
+            "Spot Type", choices=spot_types, default=spot_type_def
+        )
+        winter = BooleanField("winter", default=winter_def)
+        spring = BooleanField("spring", default=spring_def)
+        summer = BooleanField("summer", default=summer_def)
+        autumn = BooleanField("autumn", default=autumn_def)
+
+        update_spot = SubmitField("儲存變更")
+        create_spot = SubmitField("新增")
+
+    return SpotForm()
+
+
+def accommodation_form(wifi_def=1, county_def=None, note_def=None):
+    counties = get_county_selection()
+
+    class AccommodationForm(FlaskForm):
+        accommodation_name = StringField("English Name", validators=[DataRequired()])
+        accommodation_ch_name = StringField("Chinese Name", validators=[DataRequired()])
+        address = StringField("English Address", validators=[DataRequired()])
+        ch_address = StringField("Chinese Address", validators=[DataRequired()])
+        phone_number = StringField("Phone Number", validators=[DataRequired()])
+        wifi = BooleanField("WIFI", default=wifi_def)
+        county_id = SelectField("County", choices=counties, default=county_def)
+        elevation = IntegerField(
+            "Elevation",
+            validators=[NumberRange(min=0, max=4000), Optional(strip_whitespace=True)],
+        )
+        note = TextAreaField(
+            "Note", default=note_def, validators=[Optional(strip_whitespace=True)]
+        )
+        update_accommodation = SubmitField("儲存變更")
+        create_accommodation = SubmitField("新增")
+
+    return AccommodationForm()

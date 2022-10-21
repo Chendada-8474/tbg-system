@@ -5,12 +5,29 @@
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">HackMD 行程範本</h1>
+        <h1 class="h2">行程</h1>
+        <a href="{{ url_for('new_itinerary') }}"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增行程</button></a>
     </div>
 
+    <div class="row">
+
+        {% for i in itineraries %}
+        <div class="col-sm-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">#{{ i.itinerary_id }}<br>{{ i.title }}</h5>
+                    <p class="card-text">{{ i.ch_title }}</p>
+                    <a href="/itinerary/{{ i.itinerary_id }}" class="btn btn-primary">詳細資訊</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+
 </main>
-</div>
-</div>
+
 
 
 {% endblock %}

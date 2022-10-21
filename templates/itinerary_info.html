@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ itin_title.title }} - {{ itin_title.ch_title }}</h1>
+    </div>
+
+    <div class="row pt-1 pb-2 mb-3">
+        <div class="col-lg-2">
+            <div class="shadow-sm bg-light p-3 rounded-2 h-100">
+                {% for i in itin %}
+                {% if i[2] %}
+                <h5><a href="#day{{ i[0].day }}">Day {{ i[0].day }}</a></h5>
+                <br>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-10">
+            <div class="shadow-sm bg-light p-3 rounded-2 h-100">
+                <h3 class="mb-3">Itinerary</h3>
+
+                {% for i in itin %}
+                {% if i[2] %}
+                <h5 id="day{{ i[0].day }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">Day {{ i[0].day }}</h5>
+
+                <hr>
+                {% endif %}
+                <li class="fw-bolder mb-2">{{ i[1].spot_name }} - {{ i[1].spot_ch_name }}</li>
+                <p>{{ i[1].description }}</p>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-1 pb-2 mb-3">
+        <div class="col-lg-12">
+            <div class="shadow-sm bg-light p-3 rounded-2">
+                <h4>Accommodation</h4>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>住宿</th>
+                            <th>地址</th>
+                            <th>電話</th>
+                            <th>wifi</th>
+                            <th>海拔</th>
+                            <th>備註</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in accom %}
+                        <tr>
+                            <td>day {{ a[0].day }}</td>
+                            <td>{{ a[1].accommodation_ch_name }}<br>{{ a[1].accommodation_name }}</td>
+                            <td>{{ a[1].ch_address }}<br>{{ a[1].address }}</td>
+                            <td>{{ a[1].phone_number }}</td>
+                            <td>
+                                {% if a[1].wifi == 1 %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                            <td>{{ a[1].elevation }}</td>
+                            <td>{{ a[1].note }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</main>
+
+
+
+{% endblock %}

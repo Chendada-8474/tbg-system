@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, jsonify, request
 from sql_connector import *
+from data_operate import *
 from flask_form import *
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "tbg"
@@ -204,7 +206,6 @@ def edit_expenditure(trip_id, expenditure_id):
     exp_form = expenditure_form(
         item_def=exp_info.item_id, advancer_def=exp_info.advancer
     )
-    print(exp_form.validate_on_submit())
     if exp_form.validate_on_submit():
         update_expenditure(expenditure_id, exp_form)
         update_done = True
@@ -286,6 +287,37 @@ def edit_customer(id):
     )
 
 
+@app.route("/edit-spot/<int:spot_id>", methods=["GET", "POST"])
+def edit_spot(spot_id):
+    update_done = False
+    spot_edit = get_one_spot(spot_id)
+
+    winter = int_booleaner(spot_edit.winter)
+    spring = int_booleaner(spot_edit.spring)
+    summer = int_booleaner(spot_edit.summer)
+    autumn = int_booleaner(spot_edit.autumn)
+
+    onespot_form = spot_form(
+        spot_type_def=spot_edit.spot_type_id,
+        description_def=spot_edit.description,
+        winter_def=winter,
+        spring_def=spring,
+        summer_def=summer,
+        autumn_def=autumn,
+    )
+
+    if onespot_form.validate_on_submit():
+        update_spot(spot_id, onespot_form)
+        update_done = True
+
+    return render_template(
+        "edit_spot.html",
+        onespot_form=onespot_form,
+        spot_edit=spot_edit,
+        update_done=update_done,
+    )
+
+
 @app.route("/item")
 def item():
     items = get_item()
@@ -294,7 +326,138 @@ def item():
 
 @app.route("/itinerary")
 def itinerary():
-    return render_template("itinerary.html")
+    itineraries = get_itinerary_info()
+    return render_template("itinerary.html", itineraries=itineraries)
+
+
+@app.route("/itinerary/<int:itin_id>")
+def itinerary_info(itin_id):
+    itin = get_one_itinerary(itin_id)
+    itin_title = get_itinerary_title(itin_id)
+    accom = get_itinerary_accommodation(itin_id)
+    return render_template(
+        "itinerary_info.html",
+        itin=itin,
+        itin_id=itin_id,
+        itin_title=itin_title,
+        accom=accom,
+    )
+
+
+@app.route("/new-itinerary", methods=["GET", "POST"])
+def new_itinerary():
+    global spot_for_live, accommodation_for_live
+    spot_for_live = get_spot()
+    accommodation_for_live = get_accommodation_live()
+    spot_type_selction = get_spot_type_selection()
+    county_selction = get_county_selection()
+
+    if request.method == "POST":
+        if request.form["submit_buttom"] == "new_itinerary":
+            print(request.form.getlist("spot_id"))
+            print(request.form.getlist("number_of_schedule"))
+            print(request.form.getlist("accommodation_id"))
+
+    return render_template(
+        "new_itinerary.html",
+        spot_type_selction=spot_type_selction,
+        county_selction=county_selction,
+    )
+
+
+@app.route("/live-spot", methods=["GET", "POST"])
+def live_spot():
+    response_filter = request.get_json("live_spot")
+    filted_spot_table = filt_spot_by_type_county(spot_for_live, response_filter)
+    return jsonify(filted_spot_table)
+
+
+@app.route("/live-accommodation", methods=["GET", "POST"])
+def live_accommodation():
+    response_filter = request.get_json("live-accommodation")
+    filted_accommodation = filt_accommodation_by_county(
+        accommodation_for_live, response_filter
+    )
+    return jsonify(filted_accommodation)
+
+
+@app.route("/spot")
+def spot():
+    spots = classify_spot(get_spot_with_tpye_county())
+    return render_template("spot.html", spots=spots)
+
+
+@app.route("/new-spot", methods=["GET", "POST"])
+def new_spot():
+    update_done = False
+    onespot_form = spot_form()
+    if onespot_form.validate_on_submit():
+        insert_spot(onespot_form)
+        update_done = True
+
+    return render_template(
+        "new_spot.html", onespot_form=onespot_form, update_done=update_done
+    )
+
+
+@app.route("/spot/<int:spot_id>")
+def spot_info(spot_id):
+    onespot = get_one_spot_spottype(spot_id)
+    species = get_spot_species(spot_id)
+    num_sp = len(species)
+    return render_template(
+        "spot_info.html",
+        onespot=onespot,
+        species=species,
+        num_sp=num_sp,
+        spot_id=spot_id,
+    )
+
+
+@app.route("/accommodation")
+def accommodation():
+    accomm = classify_accommodation(get_accommodation_with_county())
+    return render_template("accommodation.html", accomm=accomm)
+
+
+@app.route("/edit-accommodation/<int:accommodation_id>", methods=["GET", "POST"])
+def edit_accommodation(accommodation_id):
+    update_done = False
+    accomm_info = get_one_accommodation(accommodation_id)
+    accomm_form = accommodation_form(
+        county_def=accomm_info.county_id, note_def=accomm_info.note
+    )
+    print(accomm_form.validate_on_submit())
+
+    if accomm_form.validate_on_submit():
+        update_accommodation(accommodation_id, accomm_form)
+        update_done = True
+
+    return render_template(
+        "edit_accommodation.html",
+        accomm_form=accomm_form,
+        accomm_info=accomm_info,
+        update_done=update_done,
+    )
+
+
+@app.route("/new-accommodation", methods=["GET", "POST"])
+def new_accommodation():
+    update_done = False
+    accomm_form = accommodation_form()
+    if accomm_form.validate_on_submit():
+        insert_accommodation(accomm_form)
+        update_done = True
+
+    return render_template(
+        "new_accommodation.html", accomm_form=accomm_form, update_done=update_done
+    )
+
+
+@app.route("/key-species")
+def key_species():
+    species = get_species()
+    return render_template("key_species.html", species=species)
 
 
 @app.route("/car")
