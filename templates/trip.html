@@ -70,6 +70,12 @@
                 </div>
 
                 <div>
+                    <p>
+                        <span class="fw-bold">Itinerary: </span>
+                        {% if trip_info[0][0].itinerary_id %}
+                        <a href="/itinerary/{{trip_info[0][0].itinerary_id}}">{{ trip_info[0][5].title }} - {{ trip_info[0][5].ch_title }}</a>
+                        {% endif %}
+                    </p>
                     <p><span class="fw-bold">Contact Email: </span>
                         {% if trip_info[0][1].email %}
                         <a href="mailto:{{ trip_info[0][1].email }}">{{ trip_info[0][1].email }}</a>

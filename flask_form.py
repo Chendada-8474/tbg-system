@@ -27,6 +27,7 @@ from sql_connector import (
     get_item_selection,
     get_spot_type_selection,
     get_county_selection,
+    get_itinerary_selection,
 )
 
 
@@ -102,6 +103,7 @@ def new_trip_form(num_cus):
             banks.append((b[0], "%s %s (台幣)" % (b[1], b[2])))
 
     currencies = [(i[0], "%s %s" % (i[0], i[1])) for i in get_currency_selection()]
+    itineraries = get_itinerary_selection()
 
     class NewTripForm(FlaskForm):
 
@@ -123,6 +125,7 @@ def new_trip_form(num_cus):
         end_location = StringField("End Location")
         vehicle = SelectField("Car", choices=cars)
         ebird_trip_id = IntegerField("eBird Trip ID")
+        itinerary_id = SelectField("Itinerary", choices=itineraries)
         note = TextAreaField("Note")
 
         # # Rooms
@@ -184,6 +187,7 @@ def update_trip_form(
     sales_def=1,
     accountant_def=3,
     route_control_def=1,
+    itinerary_def="",
 ):
 
     partners = [(i[0], "%s %s" % (i[1], i[2])) for i in get_partner_selection()]
@@ -200,6 +204,7 @@ def update_trip_form(
             banks.append((b[0], "%s %s (台幣)" % (b[1], b[2])))
 
     currencies = [(i[0], "%s %s" % (i[0], i[1])) for i in get_currency_selection()]
+    itineraries = get_itinerary_selection()
 
     class UpdateTripForm(FlaskForm):
 
@@ -214,7 +219,10 @@ def update_trip_form(
             validate_choice=[DataRequired()],
             default=currency_def,
         )
-        exchange_rate = FloatField("Exchange Rate", validators=[NumberRange(min=0)])
+        exchange_rate = FloatField(
+            "Exchange Rate",
+            validators=[NumberRange(min=0), Optional(strip_whitespace=True)],
+        )
         pick_up_time = TimeField(
             "Pick up Time",
             validators=[Optional()],
@@ -230,6 +238,12 @@ def update_trip_form(
         )
         vehicle = SelectField("Car", choices=cars, default=vehicle_def)
         ebird_trip_id = IntegerField("eBird Trip ID", validators=[Optional()])
+        itinerary_id = SelectField(
+            "Itinerary",
+            choices=itineraries,
+            default=itinerary_def,
+            validators=[Optional(strip_whitespace=True)],
+        )
         note = TextAreaField("Note")
 
         guide = SelectField("Guide", choices=partners, default=guide_def)
@@ -361,6 +375,7 @@ def expenditure_form(item_def=None, advancer_def=None):
 
 def spot_form(
     spot_type_def=1,
+    county_def=1,
     description_def=None,
     winter_def=False,
     spring_def=False,
@@ -368,6 +383,7 @@ def spot_form(
     autumn_def=False,
 ):
     spot_types = get_spot_type_selection()
+    counties = get_county_selection()
 
     class SpotForm(FlaskForm):
         spot_name = StringField("English Spot Name", validators=[DataRequired()])
@@ -380,6 +396,11 @@ def spot_form(
             "Description",
             default=description_def,
             validators=[Optional(strip_whitespace=True)],
+        )
+        county_id = SelectField(
+            "County",
+            choices=counties,
+            default=county_def,
         )
         spot_type_id = SelectField(
             "Spot Type", choices=spot_types, default=spot_type_def

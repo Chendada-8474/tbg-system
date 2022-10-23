@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, desc
+from sqlalchemy import create_engine, desc, case, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql.expression import func
@@ -144,11 +144,12 @@ def get_all_trip_count():
 
 def get_trip_info(id):
     trip_info = (
-        db_session.query(Trip, Customer, Car, Country, BankAccount)
+        db_session.query(Trip, Customer, Car, Country, BankAccount, ItineraryTitle)
         .join(Customer, Trip.contact_client == Customer.customer_id)
         .join(Car, Trip.vehicle == Car.car_id)
         .join(BankAccount, Trip.receiving_account == BankAccount.bank_account_id)
         .join(Country, Customer.country == Country.country_id)
+        .outerjoin(ItineraryTitle, Trip.itinerary_id == ItineraryTitle.itinerary_id)
         .filter(Trip.trip_id == id)
         .all()
     )
@@ -370,12 +371,17 @@ def get_item_selection():
 
 
 def get_max_cus_id():
-    max_id = db_session.query(func.max(Customer.customer_id)).all()[0][0]
+    max_id = db_session.query(func.max(Customer.customer_id)).first()[0]
     return max_id
 
 
 def get_max_trip_id():
-    max_id = db_session.query(func.max(Trip.trip_id)).all()[0][0]
+    max_id = db_session.query(func.max(Trip.trip_id)).first()[0]
+    return max_id
+
+
+def get_max_spot_id():
+    max_id = db_session.query(func.max(Spot.spot_id)).first()[0]
     return max_id
 
 
@@ -591,6 +597,7 @@ def update_trip(id, form):
             "quadruple_room": form.quadruple_room.data,
             "other_room": form.other_room.data,
             "vehicle": form.vehicle.data,
+            "itinerary_id": form.itinerary_id.data,
             "ebird_trip_id": form.ebird_trip_id.data,
             "receiving_account": form.receiving_account.data,
             "note": form.note.data,
@@ -732,7 +739,7 @@ def get_one_itinerary(itin_id: int):
         .all()
     )
 
-    first_day = 0
+    first_day = -1
     for i, j in enumerate(itinerary):
         if j[0].day != first_day:
             first_day = j[0].day
@@ -800,10 +807,11 @@ def get_one_spot(spot_id):
     return spot
 
 
-def get_one_spot_spottype(spot_id):
+def get_one_spot_spottype_county(spot_id):
     spot = (
-        db_session.query(Spot, SpotType)
+        db_session.query(Spot, SpotType, County)
         .join(SpotType, SpotType.spot_type_id == Spot.spot_type_id)
+        .join(County, County.county_id == Spot.county_id)
         .filter(Spot.spot_id == spot_id)
         .first()
     )
@@ -843,6 +851,7 @@ def update_spot(spot_id, form):
             "spot_ch_name": form.spot_ch_name.data,
             "longitude": form.longitude.data,
             "latitude": form.latitude.data,
+            "county_id": form.county_id.data,
             "spot_type_id": form.spot_type_id.data,
             "description": form.description.data,
             "winter": form.winter.data,
@@ -860,6 +869,7 @@ def insert_spot(form):
         spot_ch_name=form.spot_ch_name.data,
         longitude=form.longitude.data,
         latitude=form.latitude.data,
+        county_id=form.county_id.data,
         spot_type_id=form.spot_type_id.data,
         description=form.description.data,
         winter=form.winter.data,
@@ -932,9 +942,123 @@ def insert_accommodation(form):
 
 def insert_an_itinerary(itinerary_response: dict):
 
-    pass
+    # insert itinerary_title table
+    new_itinerary_title = ItineraryTitle(
+        title=itinerary_response["title"],
+        ch_title=itinerary_response["ch_title"],
+        invalid=0,
+    )
+    db_session.add(new_itinerary_title)
+    db_session.commit()
+    max_id = db_session.query(func.max(ItineraryTitle.itinerary_id)).first()[0]
+
+    # insert itinerary and itinerary_accommdation table
+    schedules = []
+    accommodations = []
+
+    for i, s in enumerate(itinerary_response["schedule"]):
+        for j, sp in enumerate(s["spots"]):
+
+            new_schedule = Itinerary(
+                itinerary_id=max_id,
+                day=i,
+                schedule=j + 1,
+                spot_id=int(sp),
+            )
+            schedules.append(new_schedule)
+
+        new_accommodation = ItineraryAccommodation(
+            itinerary_id=max_id,
+            day=i,
+            accommodation_id=int(s["accommodation"]),
+        )
+        accommodations.append(new_accommodation)
+    db_session.add_all(schedules)
+    db_session.commit()
+    db_session.add_all(accommodations)
+    db_session.commit()
+
+    return max_id
+
+
+def get_spot_title(spot_id):
+    spot_title = (
+        db_session.query(Spot.spot_name, Spot.spot_ch_name)
+        .filter(Spot.spot_id == spot_id)
+        .first()
+    )
+    return spot_title
+
+
+def key_species_spot_or_not(spot_id):
+    key_species = (
+        db_session.query(SpeciesSpot.key_species_id)
+        .filter(SpeciesSpot.spot_id == spot_id)
+        .all()
+    )
+    key_species = [i[0] for i in key_species]
+
+    statment = case([(KeySpecies.key_species_id.in_(key_species), 1)], else_=0).label(
+        "is_spot_key"
+    )
+
+    is_key_species = db_session.query(KeySpecies, statment).all()
+
+    return is_key_species
+
+
+def update_spot_key_spcies(spot_id: int, key_species: list):
+    key_species = [int(i) for i in key_species]
+
+    spot_species = (
+        db_session.query(SpeciesSpot.key_species_id)
+        .filter(SpeciesSpot.spot_id == spot_id)
+        .all()
+    )
+
+    spot_species = [i[0] for i in spot_species]
+    remove_species_id = list(set(spot_species) - set(key_species))
+    add_species_id = list(set(key_species) - set(spot_species))
+
+    db_session.query(SpeciesSpot).filter(
+        and_(
+            SpeciesSpot.spot_id == spot_id,
+            SpeciesSpot.key_species_id.in_(remove_species_id),
+        )
+    ).delete()
+    db_session.commit()
+
+    add_speices = []
+    for i in add_species_id:
+        new_speices = SpeciesSpot(spot_id=spot_id, key_species_id=i)
+        add_speices.append(new_speices)
+
+    db_session.add_all(add_speices)
+    db_session.commit()
+
+
+def invalid_itinerary(itinerary_id):
+    db_session.query(ItineraryTitle).filter(
+        ItineraryTitle.itinerary_id == itinerary_id
+    ).update(
+        {
+            "invalid": 1,
+        }
+    )
+    db_session.commit()
+
+
+def get_itinerary_selection():
+    itineraries = (
+        db_session.query(ItineraryTitle.itinerary_id, ItineraryTitle.ch_title)
+        .filter(ItineraryTitle.invalid == 0)
+        .all()
+    )
+
+    empty_choice = ("", "---")
+    itineraries.insert(0, empty_choice)
+    return itineraries
 
 
 if __name__ == "__main__":
-    query = get_accommodation_live()
-    print(query)
+    query = get_trip_info(12)

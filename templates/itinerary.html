@@ -11,16 +11,34 @@
 
     <div class="row">
 
+
         {% for i in itineraries %}
+        {% if i.invalid == 0 %}
         <div class="col-sm-4 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">#{{ i.itinerary_id }}<br>{{ i.title }}</h5>
                     <p class="card-text">{{ i.ch_title }}</p>
-                    <a href="/itinerary/{{ i.itinerary_id }}" class="btn btn-primary">詳細資訊</a>
+                    <a href="/itinerary/{{ i.itinerary_id }}" class="btn btn-primary mb-2 me-2">詳細資訊</a>
                 </div>
             </div>
         </div>
+        {% endif %}
+        {% endfor %}
+
+
+        <h4>封存行程</h4>
+        {% for i in itineraries %}
+        {% if i.invalid == 1 %}
+        <div class="col-sm-4 mb-4 opacity-50">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">#{{ i.itinerary_id }}<br>{{ i.title }}</h5>
+                    <p class="card-text">{{ i.ch_title }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% endfor %}
 
     </div>

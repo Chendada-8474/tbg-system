@@ -5,13 +5,14 @@
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">編輯地點</h1>
+        <h1 class="h2">新增地點</h1>
     </div>
     {% if update_done %}
     <div class="alert alert-success" role="alert">
-        地點已經成功增加，<a href="{{ url_for('spot') }}">回到地點頁面</a>
+        地點已經成功增加，<a href="{{ url_for('spot_info', spot_id=spot_id) }}">看一下新的地點</a>
     </div>
-    {% endif %}
+
+    {% else %}
 
     <form action="" method="POST">
         {{ onespot_form.hidden_tag() }}
@@ -29,16 +30,22 @@
                         {{onespot_form.spot_ch_name(class="form-control")}}
                     </div>
                     <div class="col-lg-2">
-                        {{onespot_form.longitude.label(class="form-label")}}
-                        {{onespot_form.longitude(class="form-control")}}
-                    </div>
-                    <div class="col-lg-2">
-                        {{onespot_form.latitude.label(class="form-label")}}
-                        {{onespot_form.latitude(class="form-control")}}
+                        {{onespot_form.county_id.label(class="form-label")}}
+                        {{onespot_form.county_id(class="form-control")}}
                     </div>
                     <div class="col-lg-2">
                         {{onespot_form.spot_type_id.label(class="form-label")}}
                         {{onespot_form.spot_type_id(class="form-control")}}
+                    </div>
+                </div>
+                <div class="row py-2">
+                    <div class="col-lg-3">
+                        {{onespot_form.longitude.label(class="form-label")}}
+                        {{onespot_form.longitude(class="form-control")}}
+                    </div>
+                    <div class="col-lg-3">
+                        {{onespot_form.latitude.label(class="form-label")}}
+                        {{onespot_form.latitude(class="form-control")}}
                     </div>
                 </div>
             </div>
@@ -77,9 +84,8 @@
 
             {{onespot_form.create_spot(class="btn btn-primary")}}
     </form>
-    </div>
+    {% endif %}
 
-    <br>
 
 </main>
 </div>

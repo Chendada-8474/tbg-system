@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, jsonify, request
+from flask import Flask, jsonify, render_template, request
 from sql_connector import *
 from data_operate import *
 from flask_form import *
@@ -120,6 +120,7 @@ def edit_trip(id):
         sales_def=trip_info.sales,
         accountant_def=trip_info.accountant,
         route_control_def=trip_info.route_control,
+        itinerary_def=trip_info.itinerary_id,
     )
 
     is_twd = True if trip_info.currency == "TWD" else False
@@ -299,6 +300,7 @@ def edit_spot(spot_id):
 
     onespot_form = spot_form(
         spot_type_def=spot_edit.spot_type_id,
+        county_def=spot_edit.county_id,
         description_def=spot_edit.description,
         winter_def=winter,
         spring_def=spring,
@@ -315,6 +317,7 @@ def edit_spot(spot_id):
         onespot_form=onespot_form,
         spot_edit=spot_edit,
         update_done=update_done,
+        spot_id=spot_id,
     )
 
 
@@ -330,17 +333,25 @@ def itinerary():
     return render_template("itinerary.html", itineraries=itineraries)
 
 
-@app.route("/itinerary/<int:itin_id>")
+@app.route("/itinerary/<int:itin_id>", methods=["GET", "POST"])
 def itinerary_info(itin_id):
+    update_done = False
     itin = get_one_itinerary(itin_id)
     itin_title = get_itinerary_title(itin_id)
     accom = get_itinerary_accommodation(itin_id)
+
+    if request.method == "POST":
+        if request.form["invalid_itinerary"] == "invalid_button":
+            invalid_itinerary(itin_id)
+            update_done = True
+
     return render_template(
         "itinerary_info.html",
         itin=itin,
         itin_id=itin_id,
         itin_title=itin_title,
         accom=accom,
+        update_done=update_done,
     )
 
 
@@ -351,17 +362,30 @@ def new_itinerary():
     accommodation_for_live = get_accommodation_live()
     spot_type_selction = get_spot_type_selection()
     county_selction = get_county_selection()
+    inserted = False
+    itinerary_id = None
 
     if request.method == "POST":
         if request.form["submit_buttom"] == "new_itinerary":
-            print(request.form.getlist("spot_id"))
-            print(request.form.getlist("number_of_schedule"))
-            print(request.form.getlist("accommodation_id"))
+            english_title = request.form.get("english_title")
+            chinese_title = request.form.get("chinese_title")
+            new_itinerary_dict = organize_itinerary_to_dict(
+                request.form.getlist("spot_id"),
+                request.form.getlist("number_of_schedule"),
+                request.form.getlist("accommodation_id"),
+                english_title=english_title,
+                chinese_title=chinese_title,
+            )
+            insert_an_itinerary(new_itinerary_dict)
+            itinerary_id = get_max_trip_id()
+            inserted = True
 
     return render_template(
         "new_itinerary.html",
         spot_type_selction=spot_type_selction,
         county_selction=county_selction,
+        inserted=inserted,
+        itinerary_id=itinerary_id,
     )
 
 
@@ -391,18 +415,23 @@ def spot():
 def new_spot():
     update_done = False
     onespot_form = spot_form()
+    spot_id = None
     if onespot_form.validate_on_submit():
         insert_spot(onespot_form)
+        spot_id = get_max_spot_id()
         update_done = True
 
     return render_template(
-        "new_spot.html", onespot_form=onespot_form, update_done=update_done
+        "new_spot.html",
+        onespot_form=onespot_form,
+        update_done=update_done,
+        spot_id=spot_id,
     )
 
 
 @app.route("/spot/<int:spot_id>")
 def spot_info(spot_id):
-    onespot = get_one_spot_spottype(spot_id)
+    onespot = get_one_spot_spottype_county(spot_id)
     species = get_spot_species(spot_id)
     num_sp = len(species)
     return render_template(
@@ -411,6 +440,28 @@ def spot_info(spot_id):
         species=species,
         num_sp=num_sp,
         spot_id=spot_id,
+    )
+
+
+@app.route("/spot/select-species/<int:spot_id>", methods=["GET", "POST"])
+def select_species(spot_id):
+
+    update_done = False
+    species = key_species_spot_or_not(spot_id)
+    spot_title = get_spot_title(spot_id)
+
+    if request.method == "POST":
+        if request.form["update_button"] == "update_key_species":
+            is_key_speices = request.form.getlist("is_key_species")
+            update_spot_key_spcies(spot_id, is_key_speices)
+            update_done = True
+
+    return render_template(
+        "select_species.html",
+        species=species,
+        spot_id=spot_id,
+        spot_title=spot_title,
+        update_done=update_done,
     )
 
 
@@ -427,7 +478,6 @@ def edit_accommodation(accommodation_id):
     accomm_form = accommodation_form(
         county_def=accomm_info.county_id, note_def=accomm_info.note
     )
-    print(accomm_form.validate_on_submit())
 
     if accomm_form.validate_on_submit():
         update_accommodation(accommodation_id, accomm_form)

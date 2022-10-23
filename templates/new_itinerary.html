@@ -31,22 +31,42 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">新增行程</h1>
         <div>
-            <button type="button" id="add-day" class='btn btn-primary'>新增天數</button>
+            {% if not inserted %}
             <button type="button" id="reorder" class='btn btn-primary'>重新整理天數</button>
+            {% endif %}
         </div>
     </div>
 
+    {% if inserted %}
+    <div class="alert alert-success" role="alert">
+        行程已經成功新增<a href="{{ url_for('itinerary', itin_id=itinerary_id) }}">看一下新的行程</a>
+    </div>
+    {% else %}
+
     <form id="itineraryForm" action="" method="POST">
+        <div class="shadow-sm bg-light p-3 rounded-2 my-3">
+            <h4 class="">行程標題</h4>
+            <div class="row">
+                <div class="col-lg-4 mb-3 me-3">
+                    <label class="form-label" for="english_title">英文行程名稱</label>
+                    <input class="form-control form-control-sm" type="text" id="english_title" placeholder="English Title" name="english_title" required>
+                </div>
+                <div class="col-lg-4 mb-3 me-3">
+                    <label class="form-label" for="chinese_title">中文行程名稱</label>
+                    <input class="form-control form-control-sm" type="text" id="chinese_title" placeholder="Chinese Title" name="chinese_title">
+                </div>
+            </div>
+        </div>
         <div id="days">
             <div id="day1" class="shadow-sm bg-light p-3 rounded-2 my-3">
 
-                <h4 class="my-3">Day 1</h4>
+                <h4 class="my-3">Day 0</h4>
                 <div class="d-flex flex-wrap">
 
                     <div class="schedule my-3 d-flex">
                         <div id="schedule1" class="one-schedule card me-3">
-                            <div class="card-header">
-                                #1
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="schedule-header">#1</div>
                                 <button type="button" class="float-end delete-schedule btn btn-outline-secondary" disabled><span data-feather="trash-2"></span></button>
                             </div>
                             <div class="card-body">
@@ -100,9 +120,11 @@
             </div>
 
         </div>
-        <button type="submit" class="btn btn-primary" name="submit_buttom" value="new_itinerary">Submit</button>
+        <button type="button" id="add-day" class='my-3 btn btn-light p-5 w-100 shadow-sm'><span data-feather="plus" class="align-text-bottom me-1"></span></button>
+        <br>
+        <button type="submit" class="btn btn-primary" name="submit_buttom" value="new_itinerary">新增行程</button>
     </form>
-
+    {% endif %}
 </main>
 
 

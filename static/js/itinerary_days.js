@@ -9,19 +9,10 @@ const numDay = divItinerary.childElementCount
 const numSchedule = document.getElementsByClassName("one-schedule").length
 var dayCount = numDay + 1
 var scheduleCount = numSchedule + 1
-const reOrderButton = document.getElementById("reorder");
 
 
 //  reset the orderation od days
-reOrderButton.addEventListener("click", function () {
-    first_day = 1
-    var days = divItinerary.children
-    for (let index = 0; index < days.length; index++) {
-        const element = days[index];
-        var labelText = element.getElementsByTagName('label')
-        labelText[0].textContent = "Day " + first_day++
-    }
-})
+
 
 function reactive_all_handler() {
     active_spot_change()
@@ -30,6 +21,28 @@ function reactive_all_handler() {
     active_add_schedule()
     active_delete_day()
     active_delete_schedule()
+    reorder_click()
+}
+
+
+function reorder_click() {
+    $('#reorder').off('click')
+    $('#reorder').click(function () {
+
+
+        first_day = 0
+        first_schedule = 1
+        $("#days").find("h4").each(function () {
+            $(this).text(`Day ${first_day}`)
+            first_day += 1
+            dayIdReorder = $(this).parent().attr("id")
+            $(`#${dayIdReorder}`).find("div.schedule-header").each(function () {
+                $(this).text(`#${first_schedule}`)
+                first_schedule += 1
+            })
+            first_schedule = 1
+        })
+    })
 }
 
 // live spot ajax
@@ -93,12 +106,15 @@ function active_add_day_click() {
         })
         newDay.find("#schedule1").attr('id', `schedule${scheduleCount}`)
         newDay.find('h4').text('New Day')
-        deleteButton = $("#schedule1").find('button.delete-schedule').clone()
-        newDay.find('div.card-header').text('New Spot').append(deleteButton)
-
+        newDay.find('div.schedule-header').text('New Spot')
         newDay.find('button.delete-day').removeAttr('disabled')
-
         newDay.find('input[name="number_of_schedule"]').attr('value', 1)
+        newDay.find('select.accommodation').find('option').each(function () {
+            $(this).remove()
+        })
+        newDay.find('select.accommodation').append('<option value=15>-- TBA --</option>')
+
+
 
         $('#days').append(newDay)
 
@@ -109,6 +125,7 @@ function active_add_day_click() {
         active_add_schedule()
         active_delete_schedule()
         active_delete_day()
+        reorder_click()
         $(".schedule").sortable();
     })
 }
@@ -121,8 +138,9 @@ function active_add_schedule() {
 
         dayId = $(this).parent().parent().attr('id')
         newCard = $("#schedule1").clone().attr("id", `schedule${scheduleCount}`)
-        deleteButton = newCard.find('button.delete-schedule').clone().removeAttr('disabled')
-        newCard.find("div.card-header").text("New Spot").append(deleteButton)
+
+        newCard.find("div.schedule-header").text("New Spot")
+        newCard.find('button.delete-schedule').removeAttr('disabled')
         scheduleCount += 1
 
         $(`#${dayId}`).find("div.schedule").append(newCard)
@@ -132,6 +150,7 @@ function active_add_schedule() {
         active_spot_change()
         active_add_day_click()
         active_delete_schedule()
+        reorder_click()
     })
 }
 
@@ -164,9 +183,7 @@ function update_number_schedule(target_day_id, add_or_sub) {
         value = Number(value) - 1
     }
     inputNumSchedule.attr('value', value)
-    console.log(target_day_id, value, add_or_sub)
 }
-
 
 
 $(document).ready(function () {

@@ -9,9 +9,10 @@
     </div>
     {% if update_done %}
     <div class="alert alert-success" role="alert">
-        住宿資訊已成功更新，<a href="/accommodation">回到住宿資訊</a>
+        住宿資訊已成功更新，<a href="{{ url_for('accommodation') }}">回到住宿資訊</a>
     </div>
-    {% endif %}
+
+    {% else %}
 
     <form action="" method="POST">
         {{ accomm_form.csrf_token }}
@@ -73,6 +74,8 @@
 
         {{accomm_form.update_accommodation(class="btn btn-primary")}}
     </form>
+
+    {% endif %}
 
     <br>
 

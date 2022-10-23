@@ -6,11 +6,6 @@
         <h1 class="h2">編輯行程</h1>
     </div>
 
-    {% if update_done %}
-    <div class="alert alert-success" role="alert">
-        所有變更已儲存，<a href="/{{trip_id}}">回到行程資訊</a>
-    </div>
-    {% endif %}
     {% if trip_form.errors %}
     <div class="alert alert-danger" role="alert">
         {{ trip_form.errors }}
@@ -18,6 +13,11 @@
     </div>
     {% endif %}
 
+    {% if update_done %}
+    <div class="alert alert-success" role="alert">
+        所有變更已儲存，<a href="/{{trip_id}}">回到行程資訊</a>
+    </div>
+    {% else %}
 
     <form action="" method="POST">
         {{ trip_form.hidden_tag() }}
@@ -40,7 +40,11 @@
 
                         <div class="col-lg-2">
                             {{ trip_form.exchange_rate.label(class="form-label") }}
+                            {% if trip_info.exchange_rate %}
                             {{ trip_form.exchange_rate(class="form-control", value=trip_info.exchange_rate) }}
+                            {% else %}
+                            {{ trip_form.exchange_rate(class="form-control") }}
+                            {% endif %}
                         </div>
 
                     </div>
@@ -62,6 +66,10 @@
                         <div class="col-lg-5">
                             {{ trip_form.vehicle.label(class="form-label") }}
                             {{ trip_form.vehicle(class="form-control") }}
+                        </div>
+                        <div class="col-lg-4">
+                            {{ trip_form.itinerary_id.label(class="form-label") }}
+                            {{ trip_form.itinerary_id(class="form-control") }}
                         </div>
                     </div>
                     <div class="row py-2">
@@ -296,7 +304,6 @@
                             </div>
                         </div>
                     </div>
-
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -306,6 +313,8 @@
 
         {{ trip_form.update_trip(class="btn btn-primary") }}
     </form>
+    {% endif %}
+
 
 </main>
 </div>

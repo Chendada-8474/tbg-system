@@ -71,6 +71,31 @@ def filt_accommodation_by_county(accommodation: list, response_filter):
     return selection
 
 
+def organize_itinerary_to_dict(
+    spots,
+    days,
+    accommodations,
+    english_title="Untitled Itinerary",
+    chinese_title="尚未命名的行程",
+):
+    schedule = []
+    for i, d in enumerate(days):
+        day_spots = []
+        num_days = int(d)
+        for n in range(num_days):
+            day_spots.append(spots[0])
+            spots.pop(0)
+        day = {"spots": day_spots, "accommodation": accommodations[i]}
+        schedule.append(day)
+    itinerary = {
+        "title": english_title,
+        "ch_title": chinese_title,
+        "schedule": schedule,
+    }
+
+    return itinerary
+
+
 if __name__ == "__main__":
     from sql_connector import get_spot
 

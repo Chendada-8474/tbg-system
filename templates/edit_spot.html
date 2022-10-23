@@ -9,9 +9,9 @@
     </div>
     {% if update_done %}
     <div class="alert alert-success" role="alert">
-        地點已經成功更新<a href="{{ url_for('spot') }}">回到地點頁面</a>
+        地點已經成功更新<a href="{{ url_for('spot_info', spot_id=spot_id) }}">回到地點資訊</a>
     </div>
-    {% endif %}
+    {% else %}
 
     <form action="" method="POST">
         {{ onespot_form.hidden_tag() }}
@@ -29,6 +29,16 @@
                         {{onespot_form.spot_ch_name(class="form-control", value=spot_edit.spot_ch_name)}}
                     </div>
                     <div class="col-lg-2">
+                        {{onespot_form.county_id.label(class="form-label")}}
+                        {{onespot_form.county_id(class="form-control")}}
+                    </div>
+                    <div class="col-lg-2">
+                        {{onespot_form.spot_type_id.label(class="form-label")}}
+                        {{onespot_form.spot_type_id(class="form-control")}}
+                    </div>
+                </div>
+                <div class="row py-2">
+                    <div class="col-lg-2">
                         {{onespot_form.longitude.label(class="form-label")}}
                         {% if spot_edit.longitude %}
                         {{onespot_form.longitude(class="form-control", value=spot_edit.longitude)}}
@@ -43,10 +53,6 @@
                         {% else %}
                         {{onespot_form.latitude(class="form-control")}}
                         {% endif %}
-                    </div>
-                    <div class="col-lg-2">
-                        {{onespot_form.spot_type_id.label(class="form-label")}}
-                        {{onespot_form.spot_type_id(class="form-control")}}
                     </div>
                 </div>
             </div>
@@ -85,12 +91,15 @@
 
             {{onespot_form.update_spot(class="btn btn-primary")}}
     </form>
-    </div>
+    {% endif %}
 
+
+    <br>
     <br>
 
     <div class="shadow-sm alert alert-danger p-3">
         <form action="" , method="POST">
+            <h5 class="mb-2">Danger Zone</h5>
             <button type="submit" class="btn btn-danger" name="delete_buttom" value="delete">刪除</button>
         </form>
     </div>
