@@ -1,5 +1,3 @@
-from email.policy import default
-from pydoc import describe
 from flask_wtf import FlaskForm
 from wtforms import Form as BaseForm
 from wtforms import (
@@ -16,7 +14,6 @@ from wtforms import (
     EmailField,
     BooleanField,
 )
-
 from wtforms.validators import DataRequired, NumberRange, Email, Optional
 from sql_connector import (
     get_partner_selection,
@@ -29,6 +26,12 @@ from sql_connector import (
     get_county_selection,
     get_itinerary_selection,
 )
+
+
+# class UserForm(FlaskForm):
+#     user_name = EmailField("Email Address", validators=[DataRequired()])
+#     password = PasswordField("Password", validators=[DataRequired()])
+#     login_button = SubmitField("Sign in")
 
 
 def customer_form(input_gender="male", country_code=232):
@@ -113,6 +116,12 @@ def new_trip_form(num_cus):
             "Number of Days", validators=[NumberRange(min=1, max=20), DataRequired()]
         )
         cost = FloatField("Cost", validators=[NumberRange(min=0), DataRequired()])
+        deposit_amount = FloatField(
+            "Deposit", validators=[NumberRange(min=0), Optional(strip_whitespace=True)]
+        )
+        deposit_date = DateField(
+            "Deposit Date", validators=[Optional(strip_whitespace=True)]
+        )
         currency = SelectField(
             "Currency",
             choices=currencies,
@@ -122,6 +131,7 @@ def new_trip_form(num_cus):
         pick_up_time = TimeField("Pick up Time", default=None, validators=[Optional()])
         # pick_up_time = TimeField("Pick up time", default=None)
         pick_up_location = StringField("Pick up Location")
+        end_time = TimeField("End Time", validators=[Optional(strip_whitespace=True)])
         end_location = StringField("End Location")
         vehicle = SelectField("Car", choices=cars)
         ebird_trip_id = IntegerField("eBird Trip ID")
@@ -213,6 +223,12 @@ def update_trip_form(
             "Number of Days", validators=[NumberRange(min=1, max=20), DataRequired()]
         )
         cost = FloatField("Cost", validators=[NumberRange(min=0), DataRequired()])
+        deposit_amount = FloatField(
+            "Deposit", validators=[NumberRange(min=0), DataRequired()]
+        )
+        deposit_date = DateField(
+            "Deposit Date", validators=[Optional(strip_whitespace=True)]
+        )
         currency = SelectField(
             "Currency",
             choices=currencies,
@@ -229,6 +245,7 @@ def update_trip_form(
         )
         # pick_up_time = TimeField("Pick up time", default=None)
         pick_up_location = StringField("Pick up Location")
+        end_time = TimeField("End Time", validators=[Optional(strip_whitespace=True)])
         end_location = StringField("End Location")
         receiving_account = SelectField(
             "Receiving Bank Account",

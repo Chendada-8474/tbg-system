@@ -158,9 +158,9 @@ function active_delete_schedule() {
     $('button.delete-schedule').off('click')
     $('button.delete-schedule').click(function () {
         scheduleIdDelete = $(this).parent().parent().attr('id')
+        dayId = $(`#${scheduleIdDelete}`).closest(".one-day").attr("id")
         $(`#${scheduleIdDelete}`).remove()
         update_number_schedule(dayId, "subtraction")
-
     })
 }
 
@@ -187,5 +187,20 @@ function update_number_schedule(target_day_id, add_or_sub) {
 
 
 $(document).ready(function () {
+
+    $(function () {
+        $('#itineraryForm').validate(
+            {
+                rules:
+                {
+                    spot_id: {
+                        required: true
+                    }
+                }
+            }
+        )
+    })
+
+
     reactive_all_handler()
 })

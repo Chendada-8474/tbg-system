@@ -7,7 +7,7 @@ def expenditure_summary(exp_info, trip_info):
     try:
         for i in exp_info:
             total_expend += i[0].unit_price * i[0].quantity
-        profit = trip_info[0][0].cost * trip_info[0][0].exchange_rate - total_expend
+        profit = trip_info[0].cost * trip_info[0].exchange_rate - total_expend
         profit = round(profit, 0)
     except:
         total_expend = None
@@ -78,6 +78,7 @@ def organize_itinerary_to_dict(
     english_title="Untitled Itinerary",
     chinese_title="尚未命名的行程",
 ):
+    print(spots, days, accommodations)
     schedule = []
     for i, d in enumerate(days):
         day_spots = []
@@ -87,6 +88,7 @@ def organize_itinerary_to_dict(
             spots.pop(0)
         day = {"spots": day_spots, "accommodation": accommodations[i]}
         schedule.append(day)
+
     itinerary = {
         "title": english_title,
         "ch_title": chinese_title,
@@ -96,11 +98,50 @@ def organize_itinerary_to_dict(
     return itinerary
 
 
-if __name__ == "__main__":
-    from sql_connector import get_spot
+def organize_query_itinerary_to_dict(
+    itinerary: list, accommodation: list, english_title=None, chinese_title=None
+):
+    accommodation = iter(accommodation)
 
-    spot_table = get_spot()
-    spot = filt_spot_by_type_county(
-        spot_table, {"spot_type_id": "3", "county_id": "13"}
+    itinerary_org = {
+        "title": english_title,
+        "ch_title": chinese_title,
+        "schedule": [],
+    }
+
+    first_day = -1
+    schedule_index = 1
+
+    for i in itinerary:
+
+        if first_day != i[0]:
+            day_accomm = next(accommodation)
+            day = {"spots": [], "accommodation": None}
+
+            # print(day_accomm)
+
+            day["accommodation"] = (day_accomm[1], day_accomm[2])
+            itinerary_org["schedule"].append(day)
+            first_day = i[0]
+
+        # print(i)
+        itinerary_org["schedule"][-1]["spots"].append((schedule_index, i[2], i[3]))
+
+        schedule_index += 1
+
+    return itinerary_org
+
+
+if __name__ == "__main__":
+    from sql_connector import get_one_itinerary_for_edit
+
+    itinerary_info, accommodations = get_one_itinerary_for_edit(6)
+
+    result = organize_query_itinerary_to_dict(
+        itinerary_info,
+        accommodations,
+        english_title="test title",
+        chinese_title="這是一個測試標題",
     )
-    print(spot)
+
+    print(result)

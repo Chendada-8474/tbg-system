@@ -15,7 +15,7 @@
         {% for i in itineraries %}
         {% if i.invalid == 0 %}
         <div class="col-sm-4 mb-4">
-            <div class="card">
+            <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title fw-bold">#{{ i.itinerary_id }}<br>{{ i.title }}</h5>
                     <p class="card-text">{{ i.ch_title }}</p>
@@ -45,7 +45,5 @@
 
 
 </main>
-
-
 
 {% endblock %}

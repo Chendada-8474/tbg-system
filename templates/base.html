@@ -11,10 +11,6 @@
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.2/examples/dashboard/">
 
-
-
-
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
@@ -100,13 +96,6 @@
                                 出團資訊
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/partner' %} active {% endif %}" href="{{ url_for('partner') }}">
-                                <span data-feather="meh" class="align-text-bottom"></span>
-                                TBG 成員資訊
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link {% if request.path == '/itinerary' %} active {% endif %}" href="{{ url_for('itinerary') }}">
                                 <span data-feather="calendar" class="align-text-bottom"></span>
@@ -138,6 +127,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/partner' %} active {% endif %}" href="{{ url_for('partner') }}">
+                                <span data-feather="meh" class="align-text-bottom"></span>
+                                TBG 成員資訊
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {% if request.path == '/car' %} active {% endif %}" href="{{ url_for('car') }}">
                                 <span data-feather="truck" class="align-text-bottom"></span>
                                 車輛資訊
@@ -150,6 +145,12 @@
                     </h6>
                     <ul class="nav flex-column mb-2">
                         <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="activity" class="align-text-bottom"></span>
+                                Google BigQuery
+                            </a>
+                        </li>
+                        <!-- <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span data-feather="activity" class="align-text-bottom"></span>
                                 損益試算
@@ -172,8 +173,20 @@
                                 <span data-feather="smile" class="align-text-bottom"></span>
                                 測試一下
                             </a>
+                        </li> -->
+                    </ul>
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+                        <span>Reports</span>
+                    </h6>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout">
+                                <span data-feather="log-out" class="align-text-bottom"></span>
+                                Sign out
+                            </a>
                         </li>
                     </ul>
+
                 </div>
             </nav>
 

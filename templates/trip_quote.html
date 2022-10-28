@@ -1,0 +1,581 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+<style>
+    .bg-quote {
+        background-color: rgb(224, 245, 255) !important;
+    }
+
+    .tbg-logo {
+        height: 2rem;
+    }
+
+    .break-page {
+        break-after: page;
+    }
+
+    * {
+        page-break-inside: avoid;
+        page-break-after: auto
+    }
+
+    .quote-table {
+        font-size: smaller;
+    }
+
+    .quote-usd-img {
+        height: 8rem;
+    }
+</style>
+
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">估價單內容</h1>
+    </div>
+
+    <div id="dashboard">
+        <div class="alert alert-primary text-body" role="alert">
+            <div class="row">
+                <div class="col-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" value="show" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">行程表</label>
+                        <input type="hidden" value="itineraryCheckBox">
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">住宿</label>
+                        <input type="hidden" value="accommodationCheckBox">
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" checked>
+                        <label class="form-check-label" for="flexSwitchCheckChecked">匯款資訊</label>
+                        <input type="hidden" value="bankCheckBox">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label for="langSelect" class="form-label">估價單語言</label>
+                    <select id="langSelect" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <option value="english">English</option>
+                        <option value="chinese">繁體中文</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button id="download" type="button" class="btn btn-primary me-4">下載</button>
+                <button id="recover" type="button" class="btn btn-success">恢復框線及編輯鈕</button>
+            </div>
+        </div>
+
+    </div>
+
+    <p class="text-center text-secondary mt-5">估價單內容</p>
+    <div id="quote" class="rounded p-3 h-100">
+
+        <section id="basicInfoCheckBox">
+
+            <div class="border border-secondary quote-page">
+
+
+                <div class="text-center">
+                    <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+                    <h3 class="english" id="title">
+                        <span>{{trip_info[1].first_name}}</span>
+                        {% if itinerary_title.title %}
+                        <span> - {{ itinerary_title.title }}</span>
+                        {% else %}
+                        <span> - {{ trip_info[0].number_of_days }} Days Birding Tour</span>
+                        {% endif %}
+                    </h3>
+                    <h3 class="chinese" id="title" hidden>{{trip_info[1].first_name}} - {{ itinerary_title.title }}</h3>
+                </div>
+
+                <hr>
+
+                <div id="basic_info" class="my-2">
+
+                    <div class="row p-3">
+                        <p class="english fw-bolder text-center mb-5">{{ company.company_en_name }} x Taiwan Bird Guide</p>
+                        <p class="chinese fw-bolder text-center mb-5" hidden>{{ company.company_ch_name }} x Taiwan Bird Guide</p>
+
+                        <div class="col-5 lh-sm">
+                            <p class="english">
+                                <span class="fw-bolder me-2">Address</span>
+                                <br>
+                                {{ company.en_address }}
+                            </p>
+                            <p class="chinese" hidden>
+                                <span class="fw-bolder me-2">聯絡地址</span>
+                                <br>
+                                {{ company.ch_address }}
+                            </p>
+                            <p>
+                                <span class="english fw-bolder me-2">Contact</span>
+                                <span class="chinese fw-bolder me-2" hidden>聯絡人</span>
+                                {{ crew["sales"] }}
+                            </p>
+                            <p>
+                                <span class="english fw-bolder me-2">Phone</span>
+                                <span class="chinese fw-bolder me-2" hidden>聯絡電話</span>
+                                {{ crew["sales_contact"]["phone_number"] }}
+                            </p>
+                            <p>
+                                <span class="fw-bolder me-2">Email</span>
+                                {{ crew["sales_contact"]["email"] }}
+                            </p>
+                        </div>
+
+                        <div class="col-7">
+
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="english text-end pe-3">Date</th>
+                                        <th scope="row" class="chinese text-end pe-3" hidden>日期</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[0].starting_date }}, {{ trip_info[0].number_of_days }} Days</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="english text-end pe-3">Prepared For</th>
+                                        <th scope="row" class="chinese text-end pe-3" hidden>客戶聯絡人</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[1].first_name }} {{ trip_info[1].last_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="text-end pe-3">Email</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[1].email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="english text-end pe-3">Phone</th>
+                                        <th scope="row" class="chinese text-end pe-3" hidden>連絡電話</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[1].phone_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="english text-end pe-3">Country</th>
+                                        <th scope="row" class="chinese text-end pe-3" hidden>國家</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[3].country_name }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row p-3">
+                        <div class="col-6">
+
+                            <table class="table table-borderless">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row" class="english pe-3">Tour Start</th>
+                                        <th scope="row" class="chinese pe-3" hidden>接待地點</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[0].pick_up_location }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="english pe-3">Tour End</th>
+                                        <th scope="row" class="chinese pe-3" hidden>結束地點</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[0].end_location }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="english pe-3">No. of Travelers</th>
+                                        <th scope="row" class="chinese pe-3" hidden>旅客人數</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[0].number_of_tourists }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row" class="english pe-3">Tour Guide & Drive</th>
+                                        <th scope="row" class="chinese pe-3" hidden>導遊 & 司機</th>
+                                        {% if crew["guide"] == crew["driver"] %}
+                                        <td class="english bg-quote px-3 text-secondary">{{ crew["guide"] }}</td>
+                                        <td class="chinese bg-quote px-3 text-secondary" hidden>{{ crew["guide_ch"] }}</td>
+                                        {% else %}
+                                        <td class="bg-quote px-3 text-secondary">{{ crew["guide"] }} / {{ crew["driver"] }}</td>
+                                        <td class="chinese bg-quote px-3 text-secondary" hidden>{{ crew["driver_ch"] }}</td>
+                                        {% endif %}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-6 align-self-end lh-sm text-end">
+                            <div>
+                                <p class="english fw-bolder">Seriel Number</p>
+                                <p class="chinese fw-bolder" hidden>估價單編號</p>
+                                <p id="quoteNumber" class="btn btn-primary bg-quote border-0 rounded-0 text-secondary">TBG-{{ trip_info[0].trip_id }}</p>
+                            </div>
+                            <div>
+                                <p class="english fw-bolder">Quote Date</p>
+                                <p class="chinese fw-bolder" hidden>報價日期</p>
+                                <p class="btn btn-primary bg-quote border-0 rounded-0 text-secondary">{{ today }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-end mb-5">
+                        <p class="fs-5 me-3 mb-4">
+                            <span class="english fw-bold">Cost: </span>
+                            <span class="chinese fw-bold" hidden>金額: </span>
+                            {{ trip_info[0].cost }} {{ trip_info[0].currency }}
+                        </p>
+                        {% if trip_info[0].deposit_amount != 0 %}
+                        <p>{{ trip_info[0].deposit_amount }} {{ trip_info[0].currency }}<span class="fw-light"> deposit to comfirm this tour</span></p>
+                        {% endif %}
+                    </div>
+
+                    <div class="my-5">
+                        <p class="english fw-light">
+                            <span class="fw-bold">
+                                Inclusion
+                            </span>
+                            <br>
+                            <span id="EnglishInclusion">Guide fee, driver's salary, accommodation of guide, driver and clients, car rental, gasoline, parking fee, toll fee, domestic transportation (airplane or ferry),entrance ticket, food (breakfast, lunch and dinner), local travel insurance and local tax... etc</span>
+                            <span>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-light btn-sm print-hidden" data-bs-toggle="modal" data-bs-target="#ModalEnglishInclusion">
+                                    <span data-feather="edit" class="align-text-bottom"></span>
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade print-hidden" id="ModalEnglishInclusion" tabindex="-1" aria-labelledby="ModalLabelEnglishInclusion" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title fs-6 fw-bolder" id="ModalLabelEnglishInclusion">Edit Inclusion</h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <textarea class="form-control inclusion-and-exclusion" id="exampleFormControlTextarea1" rows="6"></textarea>
+                                                <input type="hidden" value="EnglishInclusion">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </p>
+                        <p class="chinese fw-light" hidden>
+                            <span class="fw-bold">價格包含</span>
+                            <br>
+                            <span id="ChineseInclusion">導遊費、司機費用、所有住宿 (導遊、司機和客戶)、租車、油錢、停車費、高速公路過路費、各園區入場費、國內船班與航班和保險等等。所有價格皆含稅。</span>
+                            <span>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-light btn-sm print-hidden" data-bs-toggle="modal" data-bs-target="#ModalChineseInclusion">
+                                    <span data-feather="edit" class="align-text-bottom"></span>
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade  print-hidden" id="ModalChineseInclusion" tabindex="-1" aria-labelledby="ModalLabelChineseInclusion" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title fs-6 fw-bolder" id="ModalLabelChineseInclusion">編輯價格包含項目</h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <textarea class="form-control inclusion-and-exclusion" id="exampleFormControlTextarea1" rows="6"></textarea>
+                                                <input type="hidden" value="ChineseInclusion">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </p>
+                        <p class="english fw-light">
+                            <span class="fw-bold">Exclusion</span>
+                            <br>
+                            <span id="EnglishExclusion">Coffee, alcoholic beverages, tips... etc.</span>
+                            <span>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-light btn-sm  print-hidden" data-bs-toggle="modal" data-bs-target="#ModalEnglishExclusion">
+                                    <span data-feather="edit" class="align-text-bottom"></span>
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade  print-hidden" id="ModalEnglishExclusion" tabindex="-1" aria-labelledby="ModalLabelEnglishExclusion" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title fs-6 fw-bolder" id="ModalLabelEnglishExclusion">Edit Exclusion</h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <textarea class="form-control inclusion-and-exclusion" id="exampleFormControlTextarea1" rows="6"></textarea>
+                                                <input type="hidden" value="EnglishExclusion">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+
+                        </p>
+                        <p class="chinese fw-light" hidden>
+                            <span class="chinese fw-bold">價格不包含</span>
+                            <br>
+                            <span id="ChinesExclusion">咖啡、酒精飲料、小費等等。</span>
+                            <span>
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-light btn-sm  print-hidden" data-bs-toggle="modal" data-bs-target="#ModalChinesExclusion">
+                                    <span data-feather="edit" class="align-text-bottom"></span>
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade  print-hidden" id="ModalChinesExclusion" tabindex="-1" aria-labelledby="ModalLabelChineseExclusion" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title fs-6 fw-bolder" id="ModalLabelChineseExclusion">編輯價格不包含項目</h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <textarea class="form-control inclusion-and-exclusion" id="exampleFormControlTextarea1" rows="6"></textarea>
+                                                <input type="hidden" value="ChinesExclusion">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </span>
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="itineraryCheckBox">
+
+            <span class="break-page"></span>
+
+            <div class="border border-secondary quote-page">
+                <div class="text-center">
+                    <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+                </div>
+                <div class="p-3">
+                    <h4 id="title">
+                        <span class="enlish">Itinerary</span>
+                        <span class="chinese" hidden>行程</span>
+                    </h4>
+                    <hr>
+                    {% for i in itinerary %}
+                    {% if i[1] == 1 %}
+                    <h6 id="day{{ i[0] }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">
+                        <span class="pe-1">{{ i[6] }}</span>
+                        <span class="pe-1">{{ i[7] }}</span>
+                        <span class="pe-1">Day {{ i[0] }}</span>
+                    </h6>
+                    {% endif %}
+                    <li class="fw-bolder mb-2">
+                        <span class="english">{{ i[3] }}</span>
+                        <span class="chinese" hidden>{{ i[4] }}</span>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-outline-light btn-sm  print-hidden" data-bs-toggle="modal" data-bs-target="#exampleModal{{ i[0] }}-{{ i[2] }}">
+                            <span data-feather="edit" class="align-text-bottom"></span>
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade print-hidden" id="exampleModal{{ i[0] }}-{{ i[2] }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ i[0] }}-{{ i[2] }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title fs-6 fw-bolder" id="exampleModalLabel{{ i[0] }}-{{ i[2] }}">
+                                            Day {{ i[0] }} -
+                                            <span class="english">{{ i[3] }}</span>
+                                            <span class="chinese" hidden>{{ i[4] }}</span>
+                                        </h3>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <textarea class="form-control description" id="exampleFormControlTextarea1" rows="10">{{ i[5] }}</textarea>
+                                        <input type="hidden" value="{{ i[0] }}-{{ i[2] }}">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                    <div id="description{{ i[0] }}-{{ i[2] }}">
+                        <p>{{ i[5] }}</p>
+                    </div>
+
+
+                    {% endfor %}
+                </div>
+            </div>
+
+        </section>
+
+        <section id="accommodationCheckBox">
+
+            <span class="break-page"></span>
+
+            <div class="border border-secondary quote-page">
+                <div class="text-center">
+                    <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+                </div>
+
+                <h4 id="title">
+                    <span class="english">Accommodations</span>
+                    <span class="chinese" hidden>住宿</span>
+                </h4>
+                <hr>
+
+                <table class="table table-striped table-hover quote-table">
+                    <thead>
+                        <tr class="english">
+                            <th>Day</th>
+                            <th>Accomdation</th>
+                            <th>Address</th>
+                            <th>wifi</th>
+                            <th>Elevation</th>
+                            <th>Phone</th>
+                            <th>note</th>
+                        </tr>
+                        <tr class="chinese" hidden>
+                            <th>Day</th>
+                            <th>住宿</th>
+                            <th>地址</th>
+                            <th>wifi</th>
+                            <th>海拔</th>
+                            <th>電話</th>
+                            <th>備註</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in accommodation %}
+                        <tr>
+                            <td>D{{ a[0].day }}</td>
+                            <td>{{ a[1].accommodation_ch_name }}<br>{{ a[1].accommodation_name }}</td>
+                            <td>{{ a[1].ch_address }}<br>{{ a[1].address }}</td>
+                            <td>
+                                {% if a[1].wifi == 1 %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if a[1].elevation %}
+                                {{ a[1].elevation }}
+                                {% endif %}
+                            </td>
+                            <td class="pe-4">
+                                {% if a[1].phone_number %}
+                                {{ a[1].phone_number }}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if a[1].note %}
+                                {{ a[1].note }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+
+        </section>
+
+        <section id="bankCheckBox">
+            <span class="break-page"></span>
+
+            <div class="border border-secondary quote-page">
+                <div class="text-center">
+                    <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+                </div>
+                <div class="p-3">
+                    <div class="mb-5">
+                        <h4>
+                            <span class="english">Payment Instructions</span>
+                            <span class="chinese" hidden>付款指示</span>
+                        </h4>
+                        <hr>
+                        <h5 class="fw-bold text-muted mb-4">
+                            <span class="english">Bank Remittance</span>
+                            <span class="chinese" hidden>銀行轉帳</span>
+                        </h5>
+                        <p class="english"><span class="fw-bold">A/C Name </span>{{ trip_info[4].account_en_name }}</p>
+                        <p class="chinese" hidden><span class="fw-bold">戶名 </span>{{ trip_info[4].account_name }}</p>
+
+                        <p class="english"><span class="fw-bold">Bank English Name </span>{{ trip_info[4].bank_en_name }}</p>
+                        <p class="chinese" hidden><span class="fw-bold">銀行</span>{{ trip_info[4].bank_ch_name }}</p>
+
+                        <p>
+                            <span class="english fw-bold">A/C No. </span>
+                            <span class="chinese fw-bold" hidden>帳號 </span>
+                            {{ trip_info[4].account_number }} ({{ trip_info[0].currency }})
+                        </p>
+                        <p>
+                            <span class="fw-bold">Swift Code </span>
+                            {{ trip_info[4].swift_code }}
+                        </p>
+                        <br>
+                        <p class="english fw-light fst-italic"><span class="fw-normal">NOTICE: </span>In order to comply with the recommendations of the FATF and the regulation of the Central Bank of R.O.C. (Taiwan), please provide remitters' name, A/C No. and address on SWIFT Message.</p>
+                        <p class="chinese fw-light fst-italic" hidden><span class="fw-normal">註： </span>為了遵守防制洗錢金融行動工作組織的建議和台灣的銀行轉帳相關規定，匯款時請提供轉帳人的姓名、銀行帳戶、地址和金融機関間通信 (SWIFT message) 等相關資訊。</p>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold text-muted mb-4">
+                            <span class="english">Cash in NTD or USD</span>
+                            <span class="chinese" hidden>現金 (美金或台幣)</span>
+                        </h5>
+                        <p class="english">We take NTD or USD, but we would prefer NTD more. For the USD, we only take the latest version:</p>
+                        <p class="chinese" hidden>我們接受美金或台幣，若以美金支付費用，我們僅收以下所說明的面額及鈔票版本。</p>
+                        <ul class="english">
+                            <li>100 US Dollar: after 2013</li>
+                            <li>50 US Dollar: after 2004</li>
+                            <li>20 US Dollar: after 2003</li>
+                        </ul>
+                        <ul class="chinese" hidden>
+                            <li>美金 100 元現鈔 (2013 年或以後版本)</li>
+                            <li>美金 50 元現鈔 (2004 年或以後版本)</li>
+                            <li>美金 20 元現鈔 (2003 年或以後版本)</li>
+                        </ul>
+                        <img class="quote-usd-img m-2" src="{{ url_for('static', filename='img/usd20.jpg') }}" alt="">
+                        <img class="quote-usd-img m-2" src="{{ url_for('static', filename='img/usd50.jpg') }}" alt="">
+                        <img class="quote-usd-img m-2" src="{{ url_for('static', filename='img/usd100.jpg') }}" alt="">
+
+                        <p class="fw-light fst-italic">
+                            <span class="english">Some of the ATM in Taiwan is able to withdraw NTD from your account, but it's not guaranteed.</span>
+                            <span class="chinese" hidden>部分 ATM 能直接以外幣帳戶提領現鈔。</span>
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+
+</main>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ url_for('static', filename='js/quote_generator.js')}}"></script>
+
+{% endblock %}

@@ -1,14 +1,79 @@
-from flask import Flask, jsonify, render_template, request
+from flask import (
+    Flask,
+    jsonify,
+    redirect,
+    render_template,
+    url_for,
+    request,
+)
+from datetime import date
+from werkzeug.security import check_password_hash
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    logout_user,
+    login_required,
+)
 from sql_connector import *
 from data_operate import *
 from flask_form import *
 
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "tbg"
+
+app.config["SECRET_KEY"] = "eb4d8c3c0bf6ce2125a91c1b71c3f4f7"
+
+# login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+login_manager.login_message = "這個帳號不存在，或是密碼錯誤。"
+
+users = get_users()
 
 
+class LoginUser(UserMixin):
+    pass
+
+
+@login_manager.user_loader
+def load_user(user_login):
+    if user_login not in users:
+        return
+
+    user = LoginUser()
+    user.id = user_login
+    return user
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if request.method == "POST":
+        user_login = request.form["email"]
+
+        if user_login in users and check_password_hash(
+            users[user_login]["password"], request.form["password"]
+        ):
+            print(True)
+            user = LoginUser()
+            user.id = user_login
+            login_user(user)
+            return redirect(url_for("index"))
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return render_template("login.html")
+
+
+# app
 @app.route("/", methods=["GET", "POST"])
+@login_required
 def index():
     limit = 20
     all_trip_count = get_all_trip_count()
@@ -26,6 +91,7 @@ def index():
 
 
 @app.route("/<int:id>", methods=["GET", "POST"])
+@login_required
 def trip(id):
 
     if id not in get_trip_id():
@@ -53,7 +119,7 @@ def trip(id):
     parti = get_trip_parti(id)
     expend = get_expenditure_of_trip(id)
 
-    is_twd = True if trip_info[0][0].currency == "TWD" else False
+    is_twd = True if trip_info[0].currency == "TWD" else False
 
     total_expand, profit = expenditure_summary(expend, trip_info)
 
@@ -72,6 +138,7 @@ def trip(id):
 
 
 @app.route("/trip-deleted=<int:id>", methods=["GET", "POST"])
+@login_required
 def trip_deleted(id):
     if request.method == "POST":
         if request.form["progress_button"] == "delete":
@@ -80,6 +147,7 @@ def trip_deleted(id):
 
 
 @app.route("/new-trip", methods=["GET", "POST"])
+@login_required
 def new_trip():
 
     pre_form = PreNumberOfCustomer()
@@ -94,6 +162,7 @@ def new_trip():
 
 
 @app.route("/new-trip/trip-check", methods=["GET", "POST"])
+@login_required
 def trip_check():
     form_err = None
     trip_form = new_trip_form(1)
@@ -105,11 +174,13 @@ def trip_check():
     return render_template("trip_check.html", form_err=form_err, trip_id=trip_id)
 
 
-@app.route("/edit-trip/<int:id>", methods=["GET", "POST"])
-def edit_trip(id):
+@app.route("/edit-trip/<int:trip_id>", methods=["GET", "POST"])
+@login_required
+def edit_trip(trip_id):
+    print(trip_id)
     update_done = False
-    num_cus = get_number_of_trip_parti(id)
-    trip_info = get_one_trip(id)
+    num_cus = get_number_of_trip_parti(trip_id)
+    trip_info = get_one_trip(trip_id)
     trip_form = update_trip_form(
         currency_def=trip_info.currency,
         account_def=trip_info.receiving_account,
@@ -126,7 +197,7 @@ def edit_trip(id):
     is_twd = True if trip_info.currency == "TWD" else False
 
     if trip_form.validate_on_submit():
-        update_trip(id, trip_form)
+        update_trip(trip_id, trip_form)
         update_done = True
 
     return render_template(
@@ -135,12 +206,40 @@ def edit_trip(id):
         trip_info=trip_info,
         num_cus=num_cus,
         update_done=update_done,
-        trip_id=id,
+        trip_id=trip_id,
         is_twd=is_twd,
     )
 
 
+@app.route("/trip-quote/<int:trip_id>")
+@login_required
+def trip_quote(trip_id):
+
+    company = get_one_company(1)
+    trip_info = get_trip_info(trip_id)
+    crew = get_trip_partner(trip_id)
+    parti = get_trip_parti(trip_id)
+    itinerary = get_one_itinerary_spot_quote(trip_id)
+    itinerary_title = get_itinerary_title(trip_info[0].itinerary_id)
+    accommodation = get_itinerary_accommodation(trip_info[0].itinerary_id)
+    today = date.today()
+
+    return render_template(
+        "trip_quote.html",
+        company=company,
+        trip_id=trip_id,
+        trip_info=trip_info,
+        crew=crew,
+        parti=parti,
+        itinerary=itinerary,
+        itinerary_title=itinerary_title,
+        accommodation=accommodation,
+        today=today,
+    )
+
+
 @app.route("/<int:id>/customer", methods=["GET", "POST"])
+@login_required
 def customer(id):
     cus_info = get_trip_parti(id, all_info=True)
 
@@ -148,6 +247,7 @@ def customer(id):
 
 
 @app.route("/<int:id>/new-customer", methods=["GET", "POST"])
+@login_required
 def new_customer(id):
     cus_form = update_customer_form(country_def=232)
     if cus_form.validate_on_submit():
@@ -161,6 +261,7 @@ def new_customer(id):
 
 
 @app.route("/<int:id>/customer-inserted", methods=["GET", "POST"])
+@login_required
 def customer_inserted(id):
     form_err = None
     cus_form = update_customer_form()
@@ -178,6 +279,7 @@ def customer_inserted(id):
 
 
 @app.route("/customer-deleted=<int:id>", methods=["GET", "POST"])
+@login_required
 def customer_deleted(id):
     if request.method == "POST":
         if request.form["delete_buttom"] == "delete":
@@ -187,6 +289,7 @@ def customer_deleted(id):
 
 
 @app.route("/<int:id>/new-expenditure", methods=["GET", "POST"])
+@login_required
 def new_expenditure(id):
     update_done = False
     exp_form = expenditure_form()
@@ -201,6 +304,7 @@ def new_expenditure(id):
 @app.route(
     "/<int:trip_id>/edit-expenditure/<int:expenditure_id>", methods=["GET", "POST"]
 )
+@login_required
 def edit_expenditure(trip_id, expenditure_id):
     update_done = False
     exp_info = get_one_expenditure(expenditure_id)
@@ -224,6 +328,7 @@ def edit_expenditure(trip_id, expenditure_id):
 @app.route(
     "/<int:trip_id>/expenditure-deleted=<int:expenditure_id>", methods=["GET", "POST"]
 )
+@login_required
 def expenditure_deleted(trip_id, expenditure_id):
     if request.method == "POST":
         if request.form["delete_buttom"] == "delete":
@@ -233,6 +338,7 @@ def expenditure_deleted(trip_id, expenditure_id):
 
 
 @app.route("/partner", methods=["GET", "POST"])
+@login_required
 def partner():
     partner_form = NewPartnerForm()
     if partner_form.validate_on_submit():
@@ -243,6 +349,7 @@ def partner():
 
 
 @app.route("/new-partner", methods=["GET", "POST"])
+@login_required
 def new_partner():
     partner_form = NewPartnerForm()
 
@@ -250,6 +357,7 @@ def new_partner():
 
 
 @app.route("/edit-partner/<int:id>", methods=["GET", "POST"])
+@login_required
 def edit_partner(id):
     update_done = False
     partner_edit = get_one_partner(id)
@@ -267,6 +375,7 @@ def edit_partner(id):
 
 
 @app.route("/edit-customer/<int:id>", methods=["GET", "POST"])
+@login_required
 def edit_customer(id):
 
     update_done = False
@@ -289,6 +398,7 @@ def edit_customer(id):
 
 
 @app.route("/edit-spot/<int:spot_id>", methods=["GET", "POST"])
+@login_required
 def edit_spot(spot_id):
     update_done = False
     spot_edit = get_one_spot(spot_id)
@@ -322,21 +432,24 @@ def edit_spot(spot_id):
 
 
 @app.route("/item")
+@login_required
 def item():
     items = get_item()
     return render_template("item.html", items=items)
 
 
 @app.route("/itinerary")
+@login_required
 def itinerary():
     itineraries = get_itinerary_info()
     return render_template("itinerary.html", itineraries=itineraries)
 
 
 @app.route("/itinerary/<int:itin_id>", methods=["GET", "POST"])
+@login_required
 def itinerary_info(itin_id):
     update_done = False
-    itin = get_one_itinerary(itin_id)
+    itin = get_one_itinerary_spot(itin_id)
     itin_title = get_itinerary_title(itin_id)
     accom = get_itinerary_accommodation(itin_id)
 
@@ -356,6 +469,7 @@ def itinerary_info(itin_id):
 
 
 @app.route("/new-itinerary", methods=["GET", "POST"])
+@login_required
 def new_itinerary():
     global spot_for_live, accommodation_for_live
     spot_for_live = get_spot()
@@ -369,8 +483,9 @@ def new_itinerary():
         if request.form["submit_buttom"] == "new_itinerary":
             english_title = request.form.get("english_title")
             chinese_title = request.form.get("chinese_title")
+            spots = request.form.getlist("spot_id")
             new_itinerary_dict = organize_itinerary_to_dict(
-                request.form.getlist("spot_id"),
+                spots,
                 request.form.getlist("number_of_schedule"),
                 request.form.getlist("accommodation_id"),
                 english_title=english_title,
@@ -390,6 +505,7 @@ def new_itinerary():
 
 
 @app.route("/live-spot", methods=["GET", "POST"])
+@login_required
 def live_spot():
     response_filter = request.get_json("live_spot")
     filted_spot_table = filt_spot_by_type_county(spot_for_live, response_filter)
@@ -397,6 +513,7 @@ def live_spot():
 
 
 @app.route("/live-accommodation", methods=["GET", "POST"])
+@login_required
 def live_accommodation():
     response_filter = request.get_json("live-accommodation")
     filted_accommodation = filt_accommodation_by_county(
@@ -405,13 +522,64 @@ def live_accommodation():
     return jsonify(filted_accommodation)
 
 
+@app.route("/edit-itinerary/<int:itin_id>", methods=["GET", "POST"])
+@login_required
+def edit_itinerary(itin_id):
+    global spot_for_live, accommodation_for_live
+
+    inserted = False
+    if request.method == "POST":
+        if request.form["submit_buttom"] == "update_itinerary":
+            english_title = request.form.get("english_title")
+            chinese_title = request.form.get("chinese_title")
+            print(request.form.getlist("spot_id"))
+            print(request.form.getlist("number_of_schedule"))
+            print(request.form.getlist("accommodation_id"))
+            new_itinerary_dict = organize_itinerary_to_dict(
+                request.form.getlist("spot_id"),
+                request.form.getlist("number_of_schedule"),
+                request.form.getlist("accommodation_id"),
+                english_title=english_title,
+                chinese_title=chinese_title,
+            )
+            update_an_itinerary(itin_id, new_itinerary_dict)
+            inserted = True
+
+    spot_for_live = get_spot()
+    accommodation_for_live = get_accommodation_live()
+    spot_type_selction = get_spot_type_selection()
+    county_selction = get_county_selection()
+
+    title = get_itinerary_title(itin_id)
+    itineraries, accommodations = get_one_itinerary_for_edit(itin_id)
+
+    itin = organize_query_itinerary_to_dict(
+        itineraries,
+        accommodations,
+        english_title=title.title,
+        chinese_title=title.ch_title,
+    )
+
+    return render_template(
+        "edit_itinerary.html",
+        itin_id=itin_id,
+        inserted=inserted,
+        itin=itin,
+        title=title,
+        spot_type_selction=spot_type_selction,
+        county_selction=county_selction,
+    )
+
+
 @app.route("/spot")
+@login_required
 def spot():
     spots = classify_spot(get_spot_with_tpye_county())
     return render_template("spot.html", spots=spots)
 
 
 @app.route("/new-spot", methods=["GET", "POST"])
+@login_required
 def new_spot():
     update_done = False
     onespot_form = spot_form()
@@ -430,6 +598,7 @@ def new_spot():
 
 
 @app.route("/spot/<int:spot_id>")
+@login_required
 def spot_info(spot_id):
     onespot = get_one_spot_spottype_county(spot_id)
     species = get_spot_species(spot_id)
@@ -444,6 +613,7 @@ def spot_info(spot_id):
 
 
 @app.route("/spot/select-species/<int:spot_id>", methods=["GET", "POST"])
+@login_required
 def select_species(spot_id):
 
     update_done = False
@@ -466,12 +636,14 @@ def select_species(spot_id):
 
 
 @app.route("/accommodation")
+@login_required
 def accommodation():
     accomm = classify_accommodation(get_accommodation_with_county())
     return render_template("accommodation.html", accomm=accomm)
 
 
 @app.route("/edit-accommodation/<int:accommodation_id>", methods=["GET", "POST"])
+@login_required
 def edit_accommodation(accommodation_id):
     update_done = False
     accomm_info = get_one_accommodation(accommodation_id)
@@ -492,6 +664,7 @@ def edit_accommodation(accommodation_id):
 
 
 @app.route("/new-accommodation", methods=["GET", "POST"])
+@login_required
 def new_accommodation():
     update_done = False
     accomm_form = accommodation_form()
@@ -505,17 +678,20 @@ def new_accommodation():
 
 
 @app.route("/key-species")
+@login_required
 def key_species():
     species = get_species()
     return render_template("key_species.html", species=species)
 
 
 @app.route("/car")
+@login_required
 def car():
     cars = get_car()
     return render_template("car.html", cars=cars)
 
 
 @app.errorhandler(404)
+@login_required
 def page_not_found(e):
     return render_template("404.html", err=e), 404

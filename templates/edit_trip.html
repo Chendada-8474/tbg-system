@@ -33,7 +33,7 @@
                             {{ trip_form.cost.label(class="form-label") }}
                             {{ trip_form.cost(class="form-control", value=trip_info.cost) }}
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-3">
                             {{ trip_form.currency.label(class="form-label") }}
                             {{ trip_form.currency(class="form-control") }}
                         </div>
@@ -45,6 +45,14 @@
                             {% else %}
                             {{ trip_form.exchange_rate(class="form-control") }}
                             {% endif %}
+                        </div>
+                        <div class="col-lg-2">
+                            {{ trip_form.deposit_amount.label(class="form-label") }}
+                            {{ trip_form.deposit_amount(class="form-control", value=trip_info.deposit_amount) }}
+                        </div>
+                        <div class="col-lg-3">
+                            {{ trip_form.deposit_date.label(class="form-label") }}
+                            {{ trip_form.deposit_date(class="form-control", value=trip_info.deposit_date) }}
                         </div>
 
                     </div>
@@ -73,7 +81,7 @@
                         </div>
                     </div>
                     <div class="row py-2">
-                        <div class="col-lg-4">
+                        <div class="col-lg-5">
                             {{ trip_form.pick_up_location.label(class="form-label") }}
                             {{ trip_form.pick_up_location(class="form-control", value=trip_info.pick_up_location) }}
                         </div>
@@ -81,11 +89,19 @@
                             {{ trip_form.pick_up_time.label(class="form-label") }}
                             {{ trip_form.pick_up_time(class="form-control", value=trip_info.pick_up_time) }}
                         </div>
-                        <div class="col-lg-4">
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col-lg-5">
                             {{ trip_form.end_location.label(class="form-label") }}
                             {{ trip_form.end_location(class="form-control", value=trip_info.end_location) }}
                         </div>
+                        <div class="col-lg-4">
+                            {{ trip_form.end_time.label(class="form-label") }}
+                            {{ trip_form.end_time(class="form-control", value=trip_info.end_time) }}
+                        </div>
                     </div>
+
                     <div class="row py-2">
                         <div class="col-lg-8">
                             {{ trip_form.receiving_account.label(class="form-label") }}
@@ -311,7 +327,7 @@
 
         </div>
 
-        {{ trip_form.update_trip(class="btn btn-primary") }}
+        {{ trip_form.update_trip(class="btn btn-primary mb-5") }}
     </form>
     {% endif %}
 

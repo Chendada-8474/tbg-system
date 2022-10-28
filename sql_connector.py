@@ -1,9 +1,9 @@
-from sqlalchemy import create_engine, desc, case, and_
+from sqlalchemy import create_engine, desc, case, and_, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql.expression import func
 from datetime import date
-import pandas as pd
+
 
 engine = create_engine(
     "mysql+pymysql://root:ro2231031@192.168.1.104:3306/taiwanbirdguide"
@@ -12,8 +12,12 @@ Base = declarative_base()
 Base.metadata.reflect(engine)
 db_session = scoped_session(sessionmaker(bind=engine))
 
-STATUS_COL = ["to_quote", "deposit", "pay_off", "trip_end", "accounted"]
+TRIP_STATUS_COL = ["to_quote", "deposit", "pay_off", "trip_end", "accounted"]
 TRIP_STATUS = ["quote sent", "got deposit", "paid off", "trip finished", "reimbursed"]
+
+
+class User(Base):
+    __table__ = Base.metadata.tables["user"]
 
 
 class Trip(Base):
@@ -92,6 +96,15 @@ class County(Base):
     __table__ = Base.metadata.tables["county"]
 
 
+class Company(Base):
+    __table__ = Base.metadata.tables["company"]
+
+
+def get_one_company(company_id):
+    company = db_session.query(Company).filter(Company.company_id == company_id).first()
+    return company
+
+
 def get_index_table(limit=5):
     trip = (
         db_session.query(
@@ -151,7 +164,7 @@ def get_trip_info(id):
         .join(Country, Customer.country == Country.country_id)
         .outerjoin(ItineraryTitle, Trip.itinerary_id == ItineraryTitle.itinerary_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
     return trip_info
 
@@ -164,49 +177,70 @@ def get_one_trip(id):
 
 def get_trip_partner(id):
     guide = (
-        db_session.query(Trip.trip_id, Partner.first_name, Partner.last_name)
+        db_session.query(
+            Trip.trip_id,
+            Partner.first_name,
+            Partner.last_name,
+            Partner.ch_first_name,
+            Partner.ch_last_name,
+        )
         .join(Partner, Trip.guide == Partner.partner_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
     driver = (
-        db_session.query(Trip.trip_id, Partner.first_name, Partner.last_name)
+        db_session.query(
+            Trip.trip_id,
+            Partner.first_name,
+            Partner.last_name,
+            Partner.ch_first_name,
+            Partner.ch_last_name,
+        )
         .join(Partner, Trip.driver == Partner.partner_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
     manager = (
         db_session.query(Trip.trip_id, Partner.first_name, Partner.last_name)
         .join(Partner, Trip.manager == Partner.partner_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
     sales = (
-        db_session.query(Trip.trip_id, Partner.first_name, Partner.last_name)
+        db_session.query(
+            Trip.trip_id,
+            Partner.first_name,
+            Partner.last_name,
+            Partner.email,
+            Partner.phone_number,
+        )
         .join(Partner, Trip.sales == Partner.partner_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
     accountant = (
         db_session.query(Trip.trip_id, Partner.first_name, Partner.last_name)
         .join(Partner, Trip.accountant == Partner.partner_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
     route_control = (
         db_session.query(Trip.trip_id, Partner.first_name, Partner.last_name)
         .join(Partner, Trip.route_control == Partner.partner_id)
         .filter(Trip.trip_id == id)
-        .all()
+        .first()
     )
 
     crew = {
-        "guide": "%s %s" % (guide[0][1], guide[0][2]),
-        "driver": "%s %s" % (driver[0][1], driver[0][2]),
-        "manager": "%s %s" % (manager[0][1], manager[0][2]),
-        "sales": "%s %s" % (sales[0][1], sales[0][2]),
-        "accountant": "%s %s" % (accountant[0][1], accountant[0][2]),
-        "route_control": "%s %s" % (route_control[0][1], route_control[0][2]),
+        "guide": "%s %s" % (guide[1], guide[2]),
+        "guide_ch": "%s %s" % (guide[4], guide[3]),
+        "driver": "%s %s" % (driver[1], driver[2]),
+        "driver_ch": "%s %s" % (driver[4], driver[3]),
+        "manager": "%s %s" % (manager[1], manager[2]),
+        "sales": "%s %s" % (sales[1], sales[2]),
+        "accountant": "%s %s" % (accountant[1], accountant[2]),
+        "route_control": "%s %s" % (route_control[1], route_control[2]),
+        "sales_contact": {"email": sales[3], "phone_number": sales[4]},
     }
     return crew
 
@@ -288,33 +322,37 @@ def get_item():
     return item
 
 
-def update_progress(id: int, progress: list, how=None):
+def update_progress(trip_id: int, progress: list, how=None):
     if not how:
         return
     elif how == "next":
         for i, p in enumerate(progress):
             if p == 0:
-                upd = (
-                    db_session.query(Trip)
-                    .filter(Trip.trip_id == id)
-                    .update({STATUS_COL[i]: 1})
+                db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
+                    {TRIP_STATUS_COL[i]: 1}
                 )
+                update_deposit_date(trip_id, str(date.today()))
                 break
     elif how == "back":
-        cols = list(reversed(STATUS_COL))
+        cols = list(reversed(TRIP_STATUS_COL))
         progress.reverse()
         for i, p in enumerate(progress):
             if p == 1:
-                upd = (
-                    db_session.query(Trip)
-                    .filter(Trip.trip_id == id)
-                    .update({cols[i]: 0})
+                db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
+                    {cols[i]: 0}
                 )
                 break
     elif how == "cancel":
-        upd = db_session.query(Trip).filter(Trip.trip_id == id).update({"cancel": 1})
+        db_session.query(Trip).filter(Trip.trip_id == trip_id).update({"cancel": 1})
     elif how == "uncancel":
-        upd = db_session.query(Trip).filter(Trip.trip_id == id).update({"cancel": 0})
+        db_session.query(Trip).filter(Trip.trip_id == trip_id).update({"cancel": 0})
+    db_session.commit()
+
+
+def update_deposit_date(trip_id, update_date):
+    db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
+        {"deposit_date": update_date}
+    )
     db_session.commit()
 
 
@@ -415,9 +453,11 @@ def insert_new_trip(form):
         number_of_days=form.number_of_days.data,
         number_of_tourists=len(parti),
         cost=form.cost.data,
+        deposit_amount=form.deposit_amount.data,
         currency=form.currency.data,
         pick_up_time=form.pick_up_time.data,
         pick_up_location=form.pick_up_location.data,
+        end_time=form.end_time.data,
         end_location=form.end_location.data,
         guide=form.guide.data,
         driver=form.driver.data,
@@ -573,12 +613,14 @@ def insert_customer(cus_form, trip_id: int):
     db_session.commit()
 
 
-def update_trip(id, form):
-    db_session.query(Trip).filter(Trip.trip_id == id).update(
+def update_trip(trip_id, form):
+    db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
         {
             "starting_date": form.starting_date.data,
             "number_of_days": form.number_of_days.data,
             "cost": form.cost.data,
+            "deposit_amount": form.deposit_amount.data,
+            "deposit_date": form.deposit_date.data,
             "currency": form.currency.data,
             "exchange_rate": form.exchange_rate.data,
             "pick_up_time": form.pick_up_time.data,
@@ -597,7 +639,6 @@ def update_trip(id, form):
             "quadruple_room": form.quadruple_room.data,
             "other_room": form.other_room.data,
             "vehicle": form.vehicle.data,
-            "itinerary_id": form.itinerary_id.data,
             "ebird_trip_id": form.ebird_trip_id.data,
             "receiving_account": form.receiving_account.data,
             "note": form.note.data,
@@ -731,26 +772,27 @@ def get_itinerary_info():
     return itinerary
 
 
-def get_one_itinerary(itin_id: int):
+def get_one_itinerary_spot(itin_id: int):
+
     itinerary = (
         db_session.query(Itinerary, Spot)
         .join(Spot, Itinerary.spot_id == Spot.spot_id)
+        .join(Trip, Itinerary.itinerary_id == Trip.itinerary_id)
         .filter(Itinerary.itinerary_id == itin_id)
         .all()
     )
 
-    first_day = -1
-    for i, j in enumerate(itinerary):
-        if j[0].day != first_day:
-            first_day = j[0].day
-            row = list(j)
-            row.append(True)
-            row = tuple(row)
-        else:
-            row = list(j)
-            row.append(False)
-            row = tuple(row)
-        itinerary[i] = row
+    return itinerary
+
+
+def get_one_itinerary_spot_quote(trip_id: int):
+    sql = (
+        """
+    SELECT itinerary.day, itinerary.schedule, itinerary.spot_id, spot.spot_name, spot_ch_name, spot.description, DATE_ADD(trip.starting_date, INTERVAL itinerary.day DAY) AS "each_date", DAYNAME(DATE_ADD(trip.starting_date, INTERVAL itinerary.day DAY)) AS "day_of_week" FROM taiwanbirdguide.itinerary LEFT JOIN taiwanbirdguide.spot ON itinerary.spot_id = spot.spot_id LEFT JOIN taiwanbirdguide.trip ON trip.itinerary_id = itinerary.itinerary_id WHERE trip.trip_id = %s;
+    """
+        % trip_id
+    )
+    itinerary = db_session.execute(sql).fetchall()
 
     return itinerary
 
@@ -775,6 +817,36 @@ def get_itinerary_accommodation(itin_id: int):
         .all()
     )
     return accom
+
+
+def get_one_itinerary_for_edit(itinerary_id):
+    itinerary = (
+        db_session.query(
+            Itinerary.day,
+            Itinerary.schedule,
+            Itinerary.spot_id,
+            Spot.spot_ch_name,
+        )
+        .join(Spot, Spot.spot_id == Itinerary.spot_id)
+        .filter(Itinerary.itinerary_id == itinerary_id)
+        .all()
+    )
+
+    accommodation = (
+        db_session.query(
+            ItineraryAccommodation.day,
+            ItineraryAccommodation.accommodation_id,
+            Accommodation.accommodation_ch_name,
+        )
+        .join(
+            Accommodation,
+            Accommodation.accommodation_id == ItineraryAccommodation.accommodation_id,
+        )
+        .filter(ItineraryAccommodation.itinerary_id == itinerary_id)
+        .all()
+    )
+
+    return itinerary, accommodation
 
 
 def get_spot():
@@ -940,6 +1012,34 @@ def insert_accommodation(form):
     db_session.commit()
 
 
+def _insert_an_itinerary_alchemy(itinerary_id, itinerary_response: dict):
+    # insert itinerary and itinerary_accommdation table
+    schedules = []
+    accommodations = []
+
+    for i, s in enumerate(itinerary_response["schedule"]):
+        for j, sp in enumerate(s["spots"]):
+
+            new_schedule = Itinerary(
+                itinerary_id=itinerary_id,
+                day=i,
+                schedule=j + 1,
+                spot_id=int(sp),
+            )
+            schedules.append(new_schedule)
+
+        new_accommodation = ItineraryAccommodation(
+            itinerary_id=itinerary_id,
+            day=i,
+            accommodation_id=int(s["accommodation"]),
+        )
+        accommodations.append(new_accommodation)
+    db_session.add_all(schedules)
+    db_session.commit()
+    db_session.add_all(accommodations)
+    db_session.commit()
+
+
 def insert_an_itinerary(itinerary_response: dict):
 
     # insert itinerary_title table
@@ -952,33 +1052,28 @@ def insert_an_itinerary(itinerary_response: dict):
     db_session.commit()
     max_id = db_session.query(func.max(ItineraryTitle.itinerary_id)).first()[0]
 
-    # insert itinerary and itinerary_accommdation table
-    schedules = []
-    accommodations = []
+    _insert_an_itinerary_alchemy(max_id, itinerary_response)
 
-    for i, s in enumerate(itinerary_response["schedule"]):
-        for j, sp in enumerate(s["spots"]):
 
-            new_schedule = Itinerary(
-                itinerary_id=max_id,
-                day=i,
-                schedule=j + 1,
-                spot_id=int(sp),
-            )
-            schedules.append(new_schedule)
-
-        new_accommodation = ItineraryAccommodation(
-            itinerary_id=max_id,
-            day=i,
-            accommodation_id=int(s["accommodation"]),
-        )
-        accommodations.append(new_accommodation)
-    db_session.add_all(schedules)
-    db_session.commit()
-    db_session.add_all(accommodations)
+def update_an_itinerary(itinerary_id, itinerary_response: dict):
+    db_session.query(ItineraryTitle).filter(
+        ItineraryTitle.itinerary_id == itinerary_id
+    ).update(
+        {
+            "title": itinerary_response["title"],
+            "ch_title": itinerary_response["ch_title"],
+        }
+    )
     db_session.commit()
 
-    return max_id
+    db_session.query(Itinerary).filter(Itinerary.itinerary_id == itinerary_id).delete()
+    db_session.commit()
+    db_session.query(ItineraryAccommodation).filter(
+        ItineraryAccommodation.itinerary_id == itinerary_id
+    ).delete()
+    db_session.commit()
+
+    _insert_an_itinerary_alchemy(itinerary_id, itinerary_response)
 
 
 def get_spot_title(spot_id):
@@ -1060,5 +1155,25 @@ def get_itinerary_selection():
     return itineraries
 
 
+def get_one_user(user_id: int):
+    user = db_session.query(User).filter(User.user_id == user_id).first()
+    return user
+
+
+def get_user_by_username(email: str):
+    user = db_session.query(User).filter(User.user_name == email).first()
+    return user
+
+
+def get_users():
+    users = db_session.query(User).all()
+    user_dict = {}
+    for i in users:
+        user_dict[i.user_name] = {}
+        user_dict[i.user_name]["password"] = i.password
+    return user_dict
+
+
 if __name__ == "__main__":
-    query = get_trip_info(12)
+    query = get_one_itinerary_spot_quote(6)
+    print(query)

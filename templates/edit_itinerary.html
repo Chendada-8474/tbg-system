@@ -5,7 +5,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
 
 <style>
     .one-schedule {
@@ -26,66 +25,64 @@
         padding: 0.1rem 0.2rem;
         border: none;
     }
-
-    label.error {
-        margin-top: 0.5rem;
-        color: rgb(215, 13, 13);
-    }
 </style>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2"></h1>
-        <div>
-            {% if not inserted %}
-            <button type="button" id="reorder" class='btn btn-primary'>重新整理天數</button>
-            {% endif %}
-        </div>
+        <h1 class="h2">{{ title.ch_title }} - {{ title.title }}</h1>
     </div>
+
+    {% if title.invalid == 1 %}
+    <div class="alert alert-warning" role="alert">
+        此行程已經封存<a href="{{ url_for('itinerary') }}">回到行程資訊</a>
+    </div>
+    {% else %}
 
     {% if inserted %}
     <div class="alert alert-success" role="alert">
-        行程已經成功新增<a href="{{ url_for('itinerary', itin_id=itinerary_id) }}">看一下新的行程</a>
+        行程已經成功更新<a href="/itinerary/{{ itin_id }}">看一下行程</a>
     </div>
     {% else %}
-    {% if empty_spot %}
-    <div class="alert alert-danger" role="alert">
-        必須選擇地點。
-    </div>
-    {% endif %}
 
-    <form id="itineraryForm" name="itineraryForm" action="" method="POST">
+    <form id="itineraryForm" action="" method="POST">
         <div class="shadow-sm bg-light p-3 rounded-2 my-3">
             <h4 class="">行程標題</h4>
             <div class="row">
                 <div class="col-lg-4 mb-3 me-3">
                     <label class="form-label" for="english_title">英文行程名稱</label>
-                    <input class="form-control form-control-sm" type="text" id="english_title" placeholder="English Title" name="english_title" required>
+                    <input class="form-control form-control-sm" type="text" id="english_title" placeholder="English Title" name="english_title" value="{{ itin['title'] }}" required>
                 </div>
                 <div class="col-lg-4 mb-3 me-3">
                     <label class="form-label" for="chinese_title">中文行程名稱</label>
-                    <input class="form-control form-control-sm" type="text" id="chinese_title" placeholder="Chinese Title" name="chinese_title" required>
+                    <input class="form-control form-control-sm" type="text" id="chinese_title" placeholder="Chinese Title" name="chinese_title" value="{{ itin['ch_title'] }}" required>
                 </div>
             </div>
         </div>
         <div id="days">
-            <div id="day1" class="shadow-sm bg-light p-3 rounded-2 my-3 one-day">
+            {% for s in itin['schedule'] %}
+            <div id="day{{ loop.index }}" class="shadow-sm bg-light p-3 rounded-2 my-3 one-day">
 
-                <h4 class="my-3">Day 0</h4>
+                <h4 class="my-3">Day {{ loop.index0 }}</h4>
                 <div class="d-flex flex-wrap">
 
                     <div class="schedule my-3 d-flex">
-                        <div id="schedule1" class="one-schedule card me-3">
+                        {% for sp in s['spots'] %}
+
+                        <div id="schedule{{ sp[0] }}" class="one-schedule card me-3">
                             <div class="card-header d-flex justify-content-between">
-                                <div class="schedule-header">#1</div>
+                                <div class="schedule-header">#{{ loop.index }}</div>
+                                {% if loop.index == 1 %}
                                 <button type="button" class="float-end delete-schedule btn btn-outline-secondary" disabled><span data-feather="trash-2"></span></button>
+                                {% else %}
+                                <button type="button" class="float-end delete-schedule btn btn-outline-secondary"><span data-feather="trash-2"></span></button>
+                                {% endif %}
                             </div>
                             <div class="card-body">
                                 <p class="card-text">篩選</p>
                                 <select class="form-select form-select-sm mb-2 filter" name="spot_type_id">
                                     <option value="">-- 地點類型 --</option>
-                                    {% for s in spot_type_selction %}
-                                    <option value="{{ s[0] }}">{{ s[1] }}</option>
+                                    {% for spo in spot_type_selction %}
+                                    <option value="{{ spo[0] }}">{{ spo[1] }}</option>
                                     {% endfor %}
                                 </select>
                                 <select class="form-select form-select-sm mb-4 filter" name="county_id">
@@ -95,11 +92,15 @@
                                     {% endfor %}
                                 </select>
                                 <p class="card-text fw-bolder">地點</p>
-                                <select class="form-select form-select-sm spot required" name="spot_id">
-                                    <option value="">-- 請選擇地點 --</option>
+                                <select class="form-select form-select-sm spot" name="spot_id">
+                                    <option value="{{ sp[1] }}">{{ sp[2] }}</option>
                                 </select>
                             </div>
                         </div>
+                        {% endfor %}
+
+
+
                     </div>
 
 
@@ -119,22 +120,24 @@
                     <div class="col-lg-2">
                         <p class="fw-bolder">住宿</p>
                         <select name="accommodation_id" class="form-select form-select-sm accommodation">
-                            <option value=15>-- TBA --</option>
+                            <option value="{{ s['accommodation'][0] }}">{{ s['accommodation'][1] }}</option>
                         </select>
                     </div>
                 </div>
 
                 <button type="button" class="btn btn-danger btn-sm delete-day" disabled>刪除這一天</button>
 
-                <input type="hidden" name="number_of_schedule" value="1">
+                <input type="hidden" name="number_of_schedule" value="{{ s['spots']|length }}">
 
             </div>
-
+            {% endfor %}
         </div>
+
         <button type="button" id="add-day" class='my-3 btn btn-light p-5 w-100 shadow-sm'><span data-feather="plus" class="align-text-bottom me-1"></span></button>
         <br>
-        <button type="submit" class="btn btn-primary" name="submit_buttom" value="new_itinerary">新增行程</button>
+        <button type="submit" class="btn btn-primary mb-5" name="submit_buttom" value="update_itinerary">儲存變更</button>
     </form>
+    {% endif %}
     {% endif %}
 </main>
 

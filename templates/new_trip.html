@@ -22,7 +22,11 @@
                             {{ trip_form.cost.label(class="form-label") }}
                             {{ trip_form.cost(class="form-control") }}
                         </div>
-                        <div class="col-lg-5">
+                        <div class="col-lg-2">
+                            {{ trip_form.deposit_amount.label(class="form-label") }}
+                            {{ trip_form.deposit_amount(class="form-control") }}
+                        </div>
+                        <div class="col-lg-3">
                             {{ trip_form.currency.label(class="form-label") }}
                             {{ trip_form.currency(class="form-control") }}
                         </div>
@@ -52,7 +56,7 @@
                         </div>
                     </div>
                     <div class="row py-2">
-                        <div class="col-lg-4">
+                        <div class="col-lg-5">
                             {{ trip_form.pick_up_location.label(class="form-label") }}
                             {{ trip_form.pick_up_location(class="form-control") }}
                         </div>
@@ -60,9 +64,16 @@
                             {{ trip_form.pick_up_time.label(class="form-label") }}
                             {{ trip_form.pick_up_time(class="form-control") }}
                         </div>
-                        <div class="col-lg-4">
+                    </div>
+
+                    <div class="row py-2">
+                        <div class="col-lg-5">
                             {{ trip_form.end_location.label(class="form-label") }}
                             {{ trip_form.end_location(class="form-control") }}
+                        </div>
+                        <div class="col-lg-4">
+                            {{ trip_form.end_time.label(class="form-label") }}
+                            {{ trip_form.end_time(class="form-control") }}
                         </div>
                     </div>
                     <div class="row py-2">

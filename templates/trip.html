@@ -5,24 +5,20 @@
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <!-- <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{trip_info[0][1].first_name}} {{trip_info[0][1].last_name}} {{ trip_info[0][0].starting_date }}</h1>
+        <h1 class="h2">{{trip_info[1].first_name}} {{trip_info[1].last_name}} {{ trip_info[0].starting_date }}</h1>
     </div> -->
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{trip_info[0][1].first_name}} {{trip_info[0][1].last_name}} {{ trip_info[0][0].number_of_days }} days ({{ trip_info[0][3].country_name }})</h1>
+        <h1 class="h2">{{trip_info[1].first_name}} {{trip_info[1].last_name}} {{ trip_info[0].number_of_days }} days ({{ trip_info[3].country_name }})</h1>
 
         <div>
             <div class="btn-group m-1" role="group" aria-label="Basic example">
                 <form action="" method="post">
-                    <button type="submit" name="progress_button" class="btn btn-secondary" value="back">上一步</button>
-                    <button type="submit" name="progress_button" class="btn btn-success" value="next">下一步</button>
+                    <button type="submit" name="progress_button" class="btn btn-secondary" value="back" {% if trip_info[0].cancel==1 %}disabled{% endif %}>上一步</button>
+                    <button type="submit" name="progress_button" class="btn btn-success" value="next" {% if trip_info[0].cancel==1 %}disabled{% endif %}>下一步</button>
                 </form>
             </div>
-            <a href="/edit-trip/{{trip_id}}" class="m-1">
-                <button type="button" type="submit" class="btn btn-primary">編輯行程資訊</button>
-            </a>
-            <a href="">
-                <button type="button" class="btn btn-success m-1">下載估價單</button>
-            </a>
+            <a href="/edit-trip/{{trip_id}}" class="m-1 btn btn-primary">編輯行程資訊</a>
+            <a href="{{ url_for('trip_quote', trip_id=trip_id ) }}" class="btn btn-success m-1">製作估價單</a>
         </div>
     </div>
 
@@ -30,15 +26,15 @@
         {% if cancel == 0 %}
         <p class="bg-success bg-opacity-25 rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .50;">draft</p>
         <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
-        <p class="{% if trip_info[0][0].to_quote == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .60;">quote sent</p>
+        <p class="{% if trip_info[0].to_quote == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .60;">quote sent</p>
         <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
-        <p class="{% if trip_info[0][0].deposit == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .70;">got deposit</p>
+        <p class="{% if trip_info[0].deposit == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .70;">got deposit</p>
         <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
-        <p class="{% if trip_info[0][0].pay_off == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .80;">paid off</p>
+        <p class="{% if trip_info[0].pay_off == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .80;">paid off</p>
         <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
-        <p class="{% if trip_info[0][0].trip_end == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .90;">trip finished</p>
+        <p class="{% if trip_info[0].trip_end == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1" style="--bs-bg-opacity: .90;">trip finished</p>
         <span data-feather="arrow-right" class="align-text-bottom m-1"></span>
-        <p class="{% if trip_info[0][0].accounted == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1">reimbursed</p>
+        <p class="{% if trip_info[0].accounted == 1 %}bg-success{% else %}bg-secondary{% endif %} rounded-5 text-white px-2 m-1">reimbursed</p>
         {% else %}
         <p class="bg-danger rounded-5 text-white px-2 m-1">cancelled</p>
         {% endif %}
@@ -53,52 +49,60 @@
                 <div class="row py-2">
                     <div class="col-lg-3">
                         <h6 class="fw-bolder">Contact Customer</h6>
-                        <p>{{trip_info[0][1].first_name}} {{trip_info[0][1].last_name}}</p>
+                        <p>{{trip_info[1].first_name}} {{trip_info[1].last_name}}</p>
                     </div>
                     <div class="col-lg-3">
                         <h6 class="fw-bolder">Start Date</h6>
-                        <p>{{ trip_info[0][0].starting_date }}</p>
+                        <p>{{ trip_info[0].starting_date }}</p>
                     </div>
                     <div class="col-lg-3">
                         <h6 class="fw-bolder">Days</h6>
-                        <p>{{ trip_info[0][0].number_of_days }}</p>
+                        <p>{{ trip_info[0].number_of_days }}</p>
                     </div>
                     <div class="col-lg-3">
                         <h6 class="fw-bolder">Number of Tourists</h6>
-                        <p>{{ trip_info[0][0].number_of_tourists }}</p>
+                        <p>{{ trip_info[0].number_of_tourists }}</p>
                     </div>
                 </div>
 
-                <div>
+                <div class="row py-2">
+                    <div class="col-lg-4">
+                        <p><span class="fw-bold">Pick up:</span><br>{{ trip_info[0].pick_up_location }} {{trip_info[0].pick_up_time}}</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <p><span class="fw-bold">Trip End:</span><br>{{ trip_info[0].end_location }} {% if trip_info[0].end_time %}{{ trip_info[0].end_time }}{% endif %}</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <p><span class="fw-bold">Vehicle:</span><br>{{ trip_info[2].seat }}-seats {{ trip_info[2].brand }} {{ trip_info[2].model }}</p>
+                    </div>
+                </div>
+
+                <div class="row py-2">
                     <p>
                         <span class="fw-bold">Itinerary: </span>
-                        {% if trip_info[0][0].itinerary_id %}
-                        <a href="/itinerary/{{trip_info[0][0].itinerary_id}}">{{ trip_info[0][5].title }} - {{ trip_info[0][5].ch_title }}</a>
+                        {% if trip_info[0].itinerary_id %}
+                        <a href="/itinerary/{{trip_info[0].itinerary_id}}">{{ trip_info[5].title }} - {{ trip_info[5].ch_title }}</a>
                         {% endif %}
                     </p>
                     <p><span class="fw-bold">Contact Email: </span>
-                        {% if trip_info[0][1].email %}
-                        <a href="mailto:{{ trip_info[0][1].email }}">{{ trip_info[0][1].email }}</a>
+                        {% if trip_info[1].email %}
+                        <a href="mailto:{{ trip_info[1].email }}">{{ trip_info[1].email }}</a>
                         {% endif %}
                     </p>
-                    <p><span class="fw-bold">Cost: </span>{{ trip_info[0][0].cost }} {{ trip_info[0][0].currency }}</p>
-                    <p><span class="fw-bold">Exchange Rate: </span>{{ trip_info[0][0].exchange_rate }}</p>
-                    <p><span class="fw-bold">Pick up: </span>{{ trip_info[0][0].pick_up_location }} {{trip_info[0][0].pick_up_time}}</p>
-                    <p><span class="fw-bold">Trip End: </span>{{ trip_info[0][0].end_location }}</p>
-                    <p><span class="fw-bold">Vehicle: </span>{{ trip_info[0][2].seat }}-seats {{ trip_info[0][2].brand }} {{ trip_info[0][2].model }}</p>
                     <p><span class="fw-bold">eBird Trip Report: </span>
-                        {% if trip_info[0][0].ebird_trip_id %}
-                        <a target="_blank" href="https://ebird.org/tripreport/{{ trip_info[0][0].ebird_trip_id }}">https://ebird.org/tripreport/{{ trip_info[0][0].ebird_trip_id }}</a>
+                        {% if trip_info[0].ebird_trip_id %}
+                        <a target="_blank" href="https://ebird.org/tripreport/{{ trip_info[0].ebird_trip_id }}">https://ebird.org/tripreport/{{ trip_info[0].ebird_trip_id }}</a>
                         {% else %}
                         還沒整理賞鳥紀行，快去整理吧~
                         {% endif %}
                     </p>
-                    <p><span class="fw-bold">HackMD Trip Document: </span>
-                        {% if trip_info[0][0].hackmd_note_id %}
-                        <a target="_blank" href="https://hackmd.io/{{ trip_info[0][0].hackmd_note_id }}">https://hackmd.io/{{ trip_info[0][0].hackmd_note_id }}</a>
-                        {% endif %}
-                    </p>
                 </div>
+
+                {% if trip_info[0].note %}
+                <p><span class="fw-bold">Note: </span>
+                    <br>{{ trip_info[0].note }}
+                </p>
+                {% endif %}
 
             </div>
         </div>
@@ -142,27 +146,27 @@
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Single Room
-                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].single_room }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0].single_room }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Twin Room
-                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].twin_room }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0].twin_room }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Double Room
-                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].double_room }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0].double_room }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Triple Room
-                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].triple_room }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0].triple_room }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Quadruple Room
-                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].quadruple_room }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0].quadruple_room }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Other Room
-                        <span class="badge bg-primary rounded-pill">{{ trip_info[0][0].other_room }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ trip_info[0].other_room }}</span>
                     </li>
                 </ul>
             </div>
@@ -170,16 +174,34 @@
         <div class="col-lg-9">
             <div class="shadow-sm bg-light p-3 h-100 rounded-2">
                 <h4 class="pb-3">Payment</h4>
-                <p><span class="fw-bold">A/C Name: </span>{{ trip_info[0][4].account_name }}</p>
-                <p><span class="fw-bold">Bank Chinese Name: </span>{{ trip_info[0][4].bank_ch_name }}</p>
-                <p><span class="fw-bold">Bank English Name: </span>{{ trip_info[0][4].bank_en_name }}</p>
-                <p><span class="fw-bold">Branch Bank: </span>{{ trip_info[0][4].branch }}</p>
+                <p><span class="fw-bold">A/C Name: </span>{{ trip_info[4].account_name }}</p>
+                <p><span class="fw-bold">Bank Chinese Name: </span>{{ trip_info[4].bank_ch_name }}</p>
+                <p><span class="fw-bold">Bank English Name: </span>{{ trip_info[4].bank_en_name }}</p>
+                <p><span class="fw-bold">Branch Bank: </span>{{ trip_info[4].branch }}</p>
                 <p><span class="fw-bold">A/C No. : </span>
-                    {{ trip_info[0][4].account_number }} ({{ trip_info[0][0].currency }})
+                    {{ trip_info[4].account_number }} ({{ trip_info[0].currency }})
                 </p>
                 <p><span class="fw-bold">Swift Code : </span>
-                    {{ trip_info[0][4].swift_code }}
+                    {{ trip_info[4].swift_code }}
                 </p>
+                <hr>
+                <div class="row py-2">
+                    <div class="col-lg-3">
+                        <p><span class="fw-bold">Cost: </span>{{ trip_info[0].cost }} {{ trip_info[0].currency }}</p>
+                    </div>
+                    <div class="col-lg-3">
+                        <p><span class="fw-bold">Deposit: </span>{{ trip_info[0].deposit_amount }} {{ trip_info[0].currency }}</p>
+                    </div>
+                    <div class="col-lg-3">
+                        <p><span class="fw-bold">Deposit Date: </span>{{ trip_info[0].deposit_date }}</p>
+                    </div>
+                    <div class="col-lg-3">
+                        <p><span class="fw-bold">Exchange Rate: </span>{{ trip_info[0].exchange_rate }}</p>
+                    </div>
+                </div>
+
+                <div class="row py-2">
+                </div>
             </div>
         </div>
     </div>
@@ -259,7 +281,7 @@
             </table>
 
             <div class="d-flex flex-wrap">
-                {% if trip_info[0][0].accounted == 1 %}
+                {% if trip_info[0].accounted == 1 %}
                 {% if profit %}
                 <h5 class="m-3">總支出: <span>{{total_expand}} TWD</span></h5>
                 <h5 class="m-3">利潤: <span class="{% if profit > 0 %}text-success{% elif profit < 0 %}text-danger{% else %}text-warning{% endif %}">{{profit}} TWD</span></h5>

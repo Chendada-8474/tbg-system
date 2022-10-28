@@ -7,41 +7,19 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{ itin_title.title }} - {{ itin_title.ch_title }}</h1>
 
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            封存行程
-        </button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">確定要封存行程嗎？</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        封存後僅能由資料庫管理員從後台做更改，確定還是要封存嗎？
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <form action="" , method="post">
-                            <button type="submit" class="btn btn-danger" name="invalid_itinerary" value="invalid_button">封存行程</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
+        {% if not itin_title.invalid %}
+        <a href="{{ url_for('edit_itinerary', itin_id=itin_id) }}" class="btn btn-primary">編輯行程</a>
+        {% endif %}
     </div>
+
+
 
     {% if update_done %}
     <div class="alert alert-success" role="alert">
         行程已封存<a href="{{ url_for('itinerary') }}">回到行程</a>
     </div>
     {% else %}
-    <div class="d-flex flex-wrap">
+    <div class="d-flex flex-wrap {% if itin_title.invalid %} opacity-50{% endif %}">
         {% for i in itin %}
         {% if i[2] %}
         <p class="bg-primary rounded-5 px-2 m-1"><a class="text-white" href="#day{{ i[0].day }}">Day {{ i[0].day }}</a></p>
@@ -49,14 +27,14 @@
         {% endfor %}
     </div>
 
-    <div class="row pt-1 pb-2 mb-3">
 
+    <div class="row pt-1 pb-2 mb-3{% if itin_title.invalid %} opacity-50{% endif %}">
         <div class="col-lg-12">
             <div class="shadow-sm bg-light p-3 rounded-2 h-100">
                 <h3 class="mb-3">Itinerary</h3>
 
                 {% for i in itin %}
-                {% if i[2] %}
+                {% if i[0].schedule == 1 %}
                 <h5 id="day{{ i[0].day }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">Day {{ i[0].day }}</h5>
 
                 <hr>
@@ -69,7 +47,7 @@
         </div>
     </div>
 
-    <div class="row pt-1 pb-2 mb-3">
+    <div class="row pt-1 pb-2 mb-3{% if itin_title.invalid %} opacity-50{% endif %}">
         <div class="col-lg-12">
             <div class="shadow-sm bg-light p-3 rounded-2">
                 <h4>Accommodation</h4>
@@ -108,9 +86,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Button trigger modal -->
+    {% if not itin_title.invalid %}
+    <button type="button" class="btn btn-danger mb-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        封存行程
+    </button>
     {% endif %}
 
-
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">確定要封存行程嗎？</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    封存後僅能由資料庫管理員從後台做更改，確定還是要封存嗎？
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="" , method="post">
+                        <button type="submit" class="btn btn-danger" name="invalid_itinerary" value="invalid_button">封存行程</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
 
 
