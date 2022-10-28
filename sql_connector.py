@@ -40,6 +40,10 @@ class Car(Base):
     __table__ = Base.metadata.tables["car"]
 
 
+class CarBrand(Base):
+    __table__ = Base.metadata.tables["car_brand"]
+
+
 class Expenditure(Base):
     __table__ = Base.metadata.tables["expenditure"]
 
@@ -157,11 +161,14 @@ def get_all_trip_count():
 
 def get_trip_info(id):
     trip_info = (
-        db_session.query(Trip, Customer, Car, Country, BankAccount, ItineraryTitle)
+        db_session.query(
+            Trip, Customer, Car, Country, BankAccount, ItineraryTitle, CarBrand
+        )
         .join(Customer, Trip.contact_client == Customer.customer_id)
         .join(Car, Trip.vehicle == Car.car_id)
         .join(BankAccount, Trip.receiving_account == BankAccount.bank_account_id)
         .join(Country, Customer.country == Country.country_id)
+        .join(CarBrand, CarBrand.car_brand_id == Car.car_brand_id)
         .outerjoin(ItineraryTitle, Trip.itinerary_id == ItineraryTitle.itinerary_id)
         .filter(Trip.trip_id == id)
         .first()
@@ -368,7 +375,11 @@ def get_partner():
 
 
 def get_car():
-    cars = db_session.query(Car).all()
+    cars = (
+        db_session.query(Car, CarBrand)
+        .join(CarBrand, CarBrand.car_brand_id == Car.car_brand_id)
+        .all()
+    )
     return cars
 
 
@@ -406,6 +417,32 @@ def get_item_selection():
         db_session.query(Item.item_id, Item.item_name).order_by(Item.item_class).all()
     )
     return items
+
+
+def get_car_selection(brand_id=None):
+    if not brand_id:
+        cars = (
+            db_session.query(Car, CarBrand)
+            .join(CarBrand, CarBrand.car_brand_id == Car.car_brand_id)
+            .all()
+        )
+
+    else:
+        cars = (
+            db_session.query(Car, CarBrand)
+            .join(CarBrand, CarBrand.car_brand_id == Car.car_brand_id)
+            .filter(Car.car_brand_id == brand_id)
+            .all()
+        )
+
+    cars = [
+        (
+            i[0].car_id,
+            "%s - %s (%s seats)" % (i[1].brand_en_name, i[0].model, i[0].seat),
+        )
+        for i in cars
+    ]
+    return cars
 
 
 def get_max_cus_id():
@@ -625,6 +662,7 @@ def update_trip(trip_id, form):
             "exchange_rate": form.exchange_rate.data,
             "pick_up_time": form.pick_up_time.data,
             "pick_up_location": form.pick_up_location.data,
+            "end_time": form.end_time.data,
             "end_location": form.end_location.data,
             "guide": form.guide.data,
             "driver": form.driver.data,
@@ -788,7 +826,7 @@ def get_one_itinerary_spot(itin_id: int):
 def get_one_itinerary_spot_quote(trip_id: int):
     sql = (
         """
-    SELECT itinerary.day, itinerary.schedule, itinerary.spot_id, spot.spot_name, spot_ch_name, spot.description, DATE_ADD(trip.starting_date, INTERVAL itinerary.day DAY) AS "each_date", DAYNAME(DATE_ADD(trip.starting_date, INTERVAL itinerary.day DAY)) AS "day_of_week" FROM taiwanbirdguide.itinerary LEFT JOIN taiwanbirdguide.spot ON itinerary.spot_id = spot.spot_id LEFT JOIN taiwanbirdguide.trip ON trip.itinerary_id = itinerary.itinerary_id WHERE trip.trip_id = %s;
+    SELECT itinerary.day, itinerary.schedule, itinerary.spot_id, spot.spot_name, spot.spot_ch_name, spot.description, spot.ch_description, DATE_ADD(trip.starting_date, INTERVAL itinerary.day DAY) AS "each_date", DAYNAME(DATE_ADD(trip.starting_date, INTERVAL itinerary.day DAY)) AS "day_of_week" FROM taiwanbirdguide.itinerary LEFT JOIN taiwanbirdguide.spot ON itinerary.spot_id = spot.spot_id LEFT JOIN taiwanbirdguide.trip ON trip.itinerary_id = itinerary.itinerary_id WHERE trip.trip_id = %s;
     """
         % trip_id
     )
@@ -926,6 +964,7 @@ def update_spot(spot_id, form):
             "county_id": form.county_id.data,
             "spot_type_id": form.spot_type_id.data,
             "description": form.description.data,
+            "ch_description": form.ch_description.data,
             "winter": form.winter.data,
             "spring": form.spring.data,
             "summer": form.summer.data,
@@ -944,6 +983,7 @@ def insert_spot(form):
         county_id=form.county_id.data,
         spot_type_id=form.spot_type_id.data,
         description=form.description.data,
+        ch_description=form.ch_description.data,
         winter=form.winter.data,
         spring=form.spring.data,
         summer=form.summer.data,
@@ -1174,6 +1214,29 @@ def get_users():
     return user_dict
 
 
+def get_car_brand_selection():
+    brands = db_session.query(CarBrand).all()
+    brands = [
+        (i.car_brand_id, "%s - %s" % (i.brand_en_name, i.brand_ch_name)) for i in brands
+    ]
+    return brands
+
+
+def insert_car(form):
+    new_car = Car(
+        model=form.model.data,
+        car_brand_id=form.car_brand_id.data,
+        seat=form.seat.data,
+    )
+    db_session.add(new_car)
+    db_session.commit()
+
+
+def delete_car(car_id: int):
+    db_session.query(Car).filter(Car.car_id == car_id).delete()
+    db_session.commit()
+
+
 if __name__ == "__main__":
-    query = get_one_itinerary_spot_quote(6)
+    query = get_car_brand_selection()
     print(query)

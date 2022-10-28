@@ -193,6 +193,11 @@
                                         <td class="chinese bg-quote px-3 text-secondary" hidden>{{ crew["driver_ch"] }}</td>
                                         {% endif %}
                                     </tr>
+                                    <tr>
+                                        <th scope="row" class="english pe-3">Car</th>
+                                        <th scope="row" class="chinese pe-3" hidden>車型</th>
+                                        <td class="bg-quote px-3 text-secondary">{{ trip_info[6].brand_en_name }} - {{ trip_info[2].model }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -373,8 +378,8 @@
                     {% for i in itinerary %}
                     {% if i[1] == 1 %}
                     <h6 id="day{{ i[0] }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">
-                        <span class="pe-1">{{ i[6] }}</span>
                         <span class="pe-1">{{ i[7] }}</span>
+                        <span class="pe-1">{{ i[8] }}</span>
                         <span class="pe-1">Day {{ i[0] }}</span>
                     </h6>
                     {% endif %}
@@ -399,8 +404,10 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <textarea class="form-control description" id="exampleFormControlTextarea1" rows="10">{{ i[5] }}</textarea>
-                                        <input type="hidden" value="{{ i[0] }}-{{ i[2] }}">
+                                        <textarea class="form-control description english" id="exampleFormControlTextarea1" rows="10">{{ i[5] }}</textarea>
+                                        <textarea class="form-control description chinese" id="exampleFormControlTextarea1" rows="10" hidden>{{ i[6] }}</textarea>
+                                        <input class="english" type="hidden" value="description{{ i[0] }}-{{ i[2] }}">
+                                        <input class="chinese" type="hidden" value="ch_description{{ i[0] }}-{{ i[2] }}" hidden disabled>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -410,9 +417,16 @@
                         </div>
 
                     </li>
-                    <div id="description{{ i[0] }}-{{ i[2] }}">
+                    {% if i[5] %}
+                    <div class="english" id="description{{ i[0] }}-{{ i[2] }}">
                         <p>{{ i[5] }}</p>
                     </div>
+                    {% endif %}
+                    {% if i[6] %}
+                    <div class="chinese" id="ch_description{{ i[0] }}-{{ i[2] }}" hidden>
+                        <p>{{ i[6] }}</p>
+                    </div>
+                    {% endif %}
 
 
                     {% endfor %}

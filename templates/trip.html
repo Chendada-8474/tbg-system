@@ -73,7 +73,7 @@
                         <p><span class="fw-bold">Trip End:</span><br>{{ trip_info[0].end_location }} {% if trip_info[0].end_time %}{{ trip_info[0].end_time }}{% endif %}</p>
                     </div>
                     <div class="col-lg-4">
-                        <p><span class="fw-bold">Vehicle:</span><br>{{ trip_info[2].seat }}-seats {{ trip_info[2].brand }} {{ trip_info[2].model }}</p>
+                        <p><span class="fw-bold">Vehicle:</span><br>{{ trip_info[6].brand_en_name }} - {{ trip_info[2].model }} ({{ trip_info[2].seat }} seats )</p>
                     </div>
                 </div>
 

@@ -140,6 +140,7 @@ def trip(id):
 @app.route("/trip-deleted=<int:id>", methods=["GET", "POST"])
 @login_required
 def trip_deleted(id):
+
     if request.method == "POST":
         if request.form["progress_button"] == "delete":
             delete_trip(id)
@@ -149,7 +150,7 @@ def trip_deleted(id):
 @app.route("/new-trip", methods=["GET", "POST"])
 @login_required
 def new_trip():
-
+    brands = get_car_brand_selection()
     pre_form = PreNumberOfCustomer()
     if pre_form.validate_on_submit():
         number_of_tourists = pre_form.pre_num_cus.data
@@ -157,7 +158,10 @@ def new_trip():
     trip_form = new_trip_form(number_of_tourists)
 
     return render_template(
-        "new_trip.html", trip_form=trip_form, number_of_tourists=number_of_tourists
+        "new_trip.html",
+        trip_form=trip_form,
+        number_of_tourists=number_of_tourists,
+        brands=brands,
     )
 
 
@@ -171,7 +175,11 @@ def trip_check():
     if trip_form.validate_on_submit():
         insert_new_trip(trip_form)
     trip_id = get_max_trip_id()
-    return render_template("trip_check.html", form_err=form_err, trip_id=trip_id)
+    return render_template(
+        "trip_check.html",
+        form_err=form_err,
+        trip_id=trip_id,
+    )
 
 
 @app.route("/edit-trip/<int:trip_id>", methods=["GET", "POST"])
@@ -180,6 +188,7 @@ def edit_trip(trip_id):
     print(trip_id)
     update_done = False
     num_cus = get_number_of_trip_parti(trip_id)
+    brands = get_car_brand_selection()
     trip_info = get_one_trip(trip_id)
     trip_form = update_trip_form(
         currency_def=trip_info.currency,
@@ -208,7 +217,16 @@ def edit_trip(trip_id):
         update_done=update_done,
         trip_id=trip_id,
         is_twd=is_twd,
+        brands=brands,
     )
+
+
+@app.route("/live-car", methods=["GET", "POST"])
+def live_car():
+    response_filter = request.get_json("car_brand")
+    brand_selection = get_car_selection(brand_id=response_filter["brand"])
+    brand_selection = {"cars": brand_selection}
+    return jsonify(brand_selection)
 
 
 @app.route("/trip-quote/<int:trip_id>")
@@ -412,6 +430,7 @@ def edit_spot(spot_id):
         spot_type_def=spot_edit.spot_type_id,
         county_def=spot_edit.county_id,
         description_def=spot_edit.description,
+        ch_description_def=spot_edit.ch_description,
         winter_def=winter,
         spring_def=spring,
         summer_def=summer,
@@ -684,11 +703,26 @@ def key_species():
     return render_template("key_species.html", species=species)
 
 
-@app.route("/car")
+@app.route("/car", methods=["GET", "POST"])
 @login_required
 def car():
     cars = get_car()
+    if request.method == "POST":
+        delete_car(int(request.form["car_id"]))
     return render_template("car.html", cars=cars)
+
+
+@app.route("/new-car", methods=["GET", "POST"])
+@login_required
+def new_car():
+    inserted = False
+    form = car_form()
+
+    if form.validate_on_submit():
+        insert_car(form)
+        inserted = True
+
+    return render_template("new_car.html", form=form, inserted=inserted)
 
 
 @app.errorhandler(404)

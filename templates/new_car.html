@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">新增車輛</h1>
+    </div>
+    {% if inserted %}
+    <div class="alert alert-success" role="alert">
+        車輛已經成功增加，<a href="{{ url_for('car') }}">回到車輛資訊</a>
+    </div>
+
+    {% else %}
+
+    <form action="" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.csrf_token }}
+        <div class="shadow-sm bg-light p-3 mb-3 rounded-2 h-100">
+
+
+            <div class="row py-2">
+                <div class="col-lg-4">
+                    {{form.model.label(class="form-label")}}
+                    {{form.model(class="form-control")}}
+                </div>
+                <div class="col-lg-4">
+                    {{form.car_brand_id.label(class="form-label")}}
+                    {{form.car_brand_id(class="form-control")}}
+                </div>
+                <div class="col-lg-1">
+                    {{form.seat.label(class="form-label")}}
+                    {{form.seat(class="form-control")}}
+                </div>
+            </div>
+
+            {{form.create_car(class="btn btn-primary")}}
+    </form>
+    {% endif %}
+
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

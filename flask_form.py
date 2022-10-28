@@ -1,3 +1,4 @@
+from email.policy import default
 from flask_wtf import FlaskForm
 from wtforms import Form as BaseForm
 from wtforms import (
@@ -16,22 +17,18 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, NumberRange, Email, Optional
 from sql_connector import (
-    get_partner_selection,
-    get_bank_selection,
     get_car,
-    get_currency_selection,
     get_country,
-    get_item_selection,
-    get_spot_type_selection,
     get_county_selection,
     get_itinerary_selection,
+    get_currency_selection,
+    get_partner_selection,
+    get_spot_type_selection,
+    get_car_brand_selection,
+    get_car_selection,
+    get_bank_selection,
+    get_item_selection,
 )
-
-
-# class UserForm(FlaskForm):
-#     user_name = EmailField("Email Address", validators=[DataRequired()])
-#     password = PasswordField("Password", validators=[DataRequired()])
-#     login_button = SubmitField("Sign in")
 
 
 def customer_form(input_gender="male", country_code=232):
@@ -94,9 +91,7 @@ def new_trip_form(num_cus):
 
     partners = [(i[0], "%s %s" % (i[1], i[2])) for i in get_partner_selection()]
 
-    cars = [
-        (i.car_id, "%s-seats %s %s" % (i.seat, i.brand, i.model)) for i in get_car()
-    ]
+    cars = get_car_selection()
 
     banks = []
     for b in get_bank_selection():
@@ -202,9 +197,7 @@ def update_trip_form(
 
     partners = [(i[0], "%s %s" % (i[1], i[2])) for i in get_partner_selection()]
 
-    cars = [
-        (i.car_id, "%s-seats %s %s" % (i.seat, i.brand, i.model)) for i in get_car()
-    ]
+    cars = get_car_selection()
 
     banks = []
     for b in get_bank_selection():
@@ -394,6 +387,7 @@ def spot_form(
     spot_type_def=1,
     county_def=1,
     description_def=None,
+    ch_description_def=None,
     winter_def=False,
     spring_def=False,
     summer_def=False,
@@ -412,6 +406,11 @@ def spot_form(
         description = TextAreaField(
             "Description",
             default=description_def,
+            validators=[Optional(strip_whitespace=True)],
+        )
+        ch_description = TextAreaField(
+            "Chinese Description",
+            default=ch_description_def,
             validators=[Optional(strip_whitespace=True)],
         )
         county_id = SelectField(
@@ -455,3 +454,24 @@ def accommodation_form(wifi_def=1, county_def=None, note_def=None):
         create_accommodation = SubmitField("新增")
 
     return AccommodationForm()
+
+
+def car_form(car_brand_def=None):
+
+    car_brand_selection = get_car_brand_selection()
+
+    class CarForm(FlaskForm):
+        model = StringField("Model Name", validators=[DataRequired()])
+        car_brand_id = SelectField(
+            "Brand",
+            choices=car_brand_selection,
+            validators=[DataRequired()],
+            default=car_brand_def,
+        )
+        seat = IntegerField(
+            "No. of Seat",
+            validators=[DataRequired(), NumberRange(min=2, max=50)],
+        )
+        create_car = SubmitField("新增車輛")
+
+    return CarForm()

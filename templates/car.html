@@ -6,7 +6,7 @@
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">車輛資訊</h1>
-        <a href="#"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增車輛</button></a>
+        <a href="{{ url_for('new_car') }}"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增車輛</button></a>
 
     </div>
 
@@ -17,16 +17,24 @@
                 <th scope="col">Brand</th>
                 <th scope="col">Model</th>
                 <th scope="col">Number of Seat</th>
+                <th scope="col">Delete</th>
 
             </tr>
         </thead>
         <tbody>
             {% for c in cars %}
             <tr>
-                <th scope="row">{{ c.car_id }}</th>
-                <td>{{ c.brand }}</td>
-                <td>{{ c.model }}</td>
-                <td>{{ c.seat }}</td>
+                <th scope="row">{{ c[0].car_id }}</th>
+                <td>{{ c[1].brand_en_name }} - {{ c[1].brand_ch_name }}</td>
+                <td>{{ c[0].model }}</td>
+                <td>{{ c[0].seat }}</td>
+                <td>
+                    <form action="" method="post">
+                        <button type="submit" name="car_id" class="btn btn-outline-danger py-0 px-1" value="{{ c[0].car_id }}">
+                            <span data-feather="delete" class="align-text-bottom"></span>
+                        </button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

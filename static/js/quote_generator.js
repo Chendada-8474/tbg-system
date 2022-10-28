@@ -60,8 +60,9 @@ $(document).ready(function () {
     // live update description
     $("textarea.description").on('keyup paste', function () {
         description = $(this).val()
-        serialNumber = $(this).parent().find("input").val()
-        $(`#description${serialNumber} > p`).text(description)
+        serialNumber = $(this).parent().find("input[disabled!='disabled']").val()
+        console.log(serialNumber)
+        $(`#${serialNumber} > p`).text(description)
         updateAnyThing = true
     })
 
@@ -92,9 +93,14 @@ $(document).ready(function () {
         if (lang == 'chinese') {
             $('.chinese').removeAttr("hidden")
             $('.english').attr("hidden", true)
+            $('input.chinese').removeAttr("disabled")
+            $('input.english').attr("disabled", true)
+
         } else {
             $('.english').removeAttr("hidden")
             $('.chinese').attr("hidden", true)
+            $('input.english').removeAttr("disabled")
+            $('input.chinese').attr("disabled", true)
         }
     })
 
