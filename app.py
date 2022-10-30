@@ -7,7 +7,6 @@ from flask import (
     request,
 )
 from datetime import date
-from importlib_metadata import method_cache
 from werkzeug.security import check_password_hash
 from flask_login import (
     LoginManager,
@@ -70,6 +69,19 @@ def login():
 def logout():
     logout_user()
     return render_template("login.html")
+
+
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers["Cache-Control"] = "public, max-age=0"
+    return r
 
 
 # app
@@ -186,7 +198,6 @@ def trip_check():
 @app.route("/edit-trip/<int:trip_id>", methods=["GET", "POST"])
 @login_required
 def edit_trip(trip_id):
-    print(trip_id)
     update_done = False
     num_cus = get_number_of_trip_parti(trip_id)
     brands = get_car_brand_selection()
