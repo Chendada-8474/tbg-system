@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, desc, case, and_, text
+from sqlalchemy import create_engine, desc, case, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql.expression import func
@@ -13,7 +13,8 @@ MYSQL_IP = connection_info["mysql"]["ip"]
 MYSQL_DB_NAME = connection_info["mysql"]["database_name"]
 
 engine = create_engine(
-    "mysql+pymysql://root:%s@%s/%s" % (MYSQL_PW, MYSQL_IP, MYSQL_DB_NAME)
+    "mysql+pymysql://root:%s@%s/%s" % (MYSQL_PW, MYSQL_IP, MYSQL_DB_NAME),
+    isolation_level="READ UNCOMMITTED",
 )
 
 Base = declarative_base()
