@@ -1,18 +1,17 @@
 // window.jsPDF = window.jspdf.jsPDF
 
-var updateAnyThing = false
-
-
-var opt = {
-    margin: [4, 4, 20, 4],
-    image: { type: 'jpeg', quality: 1 },
-    html2canvas: { dpi: 72, scale: 2, },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pageBreak: { mode: 'css', after: '.break-page' }
-
-}
 
 $(document).ready(function () {
+    var updateAnyThing = false
+
+    var opt = {
+        margin: [4, 4, 20, 4],
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { dpi: 72, scale: 2, },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pageBreak: { mode: 'css', after: '.break-page' }
+
+    }
 
     $('textarea.inclusion-and-exclusion').each(function () {
         content = $(this).parent().find('input').val()
