@@ -131,3 +131,4 @@ dmypy.json
 # my ignore setting
 .vscode
 test.py
+init_setting.yaml

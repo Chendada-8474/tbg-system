@@ -3,11 +3,19 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql.expression import func
 from datetime import date
+import yaml
 
+with open("init_setting.yaml") as file:
+    connection_info = yaml.load(file, Loader=yaml.Loader)
+
+MYSQL_IP = connection_info["mysql"]["ip"]
+MYSQL_PW = connection_info["mysql"]["password"]
+MYSQL_DB_NAME = connection_info["mysql"]["database_name"]
 
 engine = create_engine(
-    "mysql+pymysql://root:ro2231031@192.168.1.104:3306/taiwanbirdguide"
+    "mysql+pymysql://root:%s@%s/%s" % (MYSQL_PW, MYSQL_IP, MYSQL_DB_NAME)
 )
+
 Base = declarative_base()
 Base.metadata.reflect(engine)
 db_session = scoped_session(sessionmaker(bind=engine))
