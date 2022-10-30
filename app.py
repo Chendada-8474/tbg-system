@@ -81,12 +81,23 @@ def logout():
     return render_template("login.html")
 
 
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers["Cache-Control"] = "public, max-age=0"
+    return r
+
+
 # app
 @app.route("/", methods=["GET", "POST"])
 @login_required
-@cache.cached(timeout=50)
 def index():
-    cache.clear()
     limit = 20
     all_trip_count = get_all_trip_count()
     unshown = all_trip_count - limit if all_trip_count > limit else 0
@@ -104,12 +115,11 @@ def index():
 
 @app.route("/<int:id>", methods=["GET", "POST"])
 @login_required
-@cache.cached(timeout=50)
 def trip(id):
 
     if id not in get_trip_id():
         return render_template("404.html")
-    cache.clear()
+
     progress = get_progress(id)
     cancel = get_cancel(id)
 
