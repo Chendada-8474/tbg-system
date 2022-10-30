@@ -74,15 +74,14 @@
     </div>
 
     <p class="text-center text-secondary mt-5">估價單內容</p>
-    <div id="quote" class="rounded p-3 h-100">
+    <div id="quote" class="rounded p-2 h-100">
 
         <section id="basicInfoCheckBox">
 
             <div class="border border-secondary quote-page">
 
-
                 <div class="text-center">
-                    <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+                    <img class="tbg-logo mb-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
                     <h3 class="english" id="title">
                         <span>{{trip_info[1].first_name}}</span>
                         {% if itinerary_title.title %}
@@ -218,7 +217,7 @@
 
                     <hr>
 
-                    <div class="text-end mb-5">
+                    <div class="text-end">
                         <p class="fs-5 me-3 mb-4">
                             <span class="english fw-bold">Cost: </span>
                             <span class="chinese fw-bold" hidden>金額: </span>
@@ -229,7 +228,7 @@
                         {% endif %}
                     </div>
 
-                    <div class="my-5">
+                    <div class="mt-1">
                         <p class="english fw-light">
                             <span class="fw-bold">
                                 Inclusion
@@ -356,7 +355,6 @@
                     </div>
 
                 </div>
-
             </div>
 
         </section>
@@ -369,7 +367,7 @@
                 <div class="text-center">
                     <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
                 </div>
-                <div class="p-3">
+                <div class="p-2">
                     <h4 id="title">
                         <span class="enlish">Itinerary</span>
                         <span class="chinese" hidden>行程</span>
@@ -383,7 +381,7 @@
                         <span class="pe-1">Day {{ i[0] }}</span>
                     </h6>
                     {% endif %}
-                    <li class="fw-bolder mb-2">
+                    <li class="fw-bolder mb-1">
                         <span class="english">{{ i[3] }}</span>
                         <span class="chinese" hidden>{{ i[4] }}</span>
                         <!-- Button trigger modal -->
