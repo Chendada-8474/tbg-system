@@ -8,8 +8,8 @@ import yaml
 with open("init_setting.yaml") as file:
     connection_info = yaml.load(file, Loader=yaml.Loader)
 
-MYSQL_IP = connection_info["mysql"]["ip"]
 MYSQL_PW = connection_info["mysql"]["password"]
+MYSQL_IP = connection_info["mysql"]["ip"]
 MYSQL_DB_NAME = connection_info["mysql"]["database_name"]
 
 engine = create_engine(

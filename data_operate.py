@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def expenditure_summary(exp_info, trip_info):
     total_expend = 0
 

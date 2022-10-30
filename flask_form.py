@@ -1,4 +1,3 @@
-from email.policy import default
 from flask_wtf import FlaskForm
 from wtforms import Form as BaseForm
 from wtforms import (
@@ -111,9 +110,7 @@ def new_trip_form(num_cus):
             "Number of Days", validators=[NumberRange(min=1, max=20), DataRequired()]
         )
         cost = FloatField("Cost", validators=[NumberRange(min=0), DataRequired()])
-        deposit_amount = FloatField(
-            "Deposit", validators=[NumberRange(min=0), Optional(strip_whitespace=True)]
-        )
+        deposit_amount = FloatField("Deposit", validators=[NumberRange(min=0)])
         deposit_date = DateField(
             "Deposit Date", validators=[Optional(strip_whitespace=True)]
         )
@@ -216,9 +213,7 @@ def update_trip_form(
             "Number of Days", validators=[NumberRange(min=1, max=20), DataRequired()]
         )
         cost = FloatField("Cost", validators=[NumberRange(min=0), DataRequired()])
-        deposit_amount = FloatField(
-            "Deposit", validators=[NumberRange(min=0), DataRequired()]
-        )
+        deposit_amount = FloatField("Deposit", validators=[NumberRange(min=0)])
         deposit_date = DateField(
             "Deposit Date", validators=[Optional(strip_whitespace=True)]
         )
