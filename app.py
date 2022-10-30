@@ -7,7 +7,6 @@ from flask import (
     request,
 )
 from datetime import date
-import flask_caching
 from werkzeug.security import check_password_hash
 from flask_login import (
     LoginManager,
@@ -17,7 +16,6 @@ from flask_login import (
     login_required,
 )
 from flask_caching import Cache
-from yarl import cache_clear
 from sql_connector import *
 from data_operate import *
 from flask_form import *
@@ -95,11 +93,12 @@ def index():
 
 @app.route("/<int:id>", methods=["GET", "POST"])
 @login_required
-@cache_clear
 def trip(id):
 
     if id not in get_trip_id():
         return render_template("404.html")
+
+    Cache.clear()
 
     progress = get_progress(id)
     cancel = get_cancel(id)
