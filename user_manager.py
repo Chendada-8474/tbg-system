@@ -21,12 +21,12 @@ def parser_opt():
         required=True,
     )
     parser.add_argument(
-        "--p", "--password", type=str, help="your password", required=True
+        "-p", "--password", type=str, help="your password", required=True
     )
     parser.add_argument(
         "-m",
         "--method",
-        default=["insert"],
+        default="insert",
         choices=["insert", "update", "delete"],
         help="insert, update or delete a user (default as insert)",
     )
@@ -86,4 +86,4 @@ def add_user(email, password, admin=False, method="insert"):
 
 if __name__ == "__main__":
     args = parser_opt()
-    add_user(args.email, args.password, admin=args.admin)
+    add_user(args.email, args.password, admin=args.admin, method=args.method)
