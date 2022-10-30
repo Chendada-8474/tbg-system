@@ -4,7 +4,7 @@ var updateAnyThing = false
 
 
 var opt = {
-    margin: [6, 6, 20, 6],
+    margin: [4, 4, 20, 4],
     image: { type: 'jpeg', quality: 1 },
     html2canvas: { dpi: 72, scale: 2, },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
