@@ -84,6 +84,7 @@ def logout():
 # app
 @app.route("/", methods=["GET", "POST"])
 @login_required
+@cache.cached(timeout=50)
 def index():
     cache.clear()
     limit = 20
@@ -103,6 +104,7 @@ def index():
 
 @app.route("/<int:id>", methods=["GET", "POST"])
 @login_required
+@cache.cached(timeout=50)
 def trip(id):
 
     if id not in get_trip_id():
