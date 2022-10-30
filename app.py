@@ -813,3 +813,7 @@ def new_admin_cost():
 @login_required
 def page_not_found(e):
     return render_template("404.html", err=e), 404
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=80)
