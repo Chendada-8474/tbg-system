@@ -7,6 +7,7 @@ from flask import (
     request,
 )
 from datetime import date
+import flask_caching
 from werkzeug.security import check_password_hash
 from flask_login import (
     LoginManager,
@@ -15,6 +16,8 @@ from flask_login import (
     logout_user,
     login_required,
 )
+from flask_caching import Cache
+from yarl import cache_clear
 from sql_connector import *
 from data_operate import *
 from flask_form import *
@@ -71,19 +74,6 @@ def logout():
     return render_template("login.html")
 
 
-@app.after_request
-def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers["Cache-Control"] = "public, max-age=0"
-    return r
-
-
 # app
 @app.route("/", methods=["GET", "POST"])
 @login_required
@@ -105,6 +95,7 @@ def index():
 
 @app.route("/<int:id>", methods=["GET", "POST"])
 @login_required
+@cache_clear
 def trip(id):
 
     if id not in get_trip_id():
