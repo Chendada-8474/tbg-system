@@ -60,24 +60,27 @@ def add_user(email, password, admin=False, method="insert"):
         db_session.commit()
 
     elif method == "update":
-        if email not in users_dict:
-            print("user not found")
-            return
+        print("delete function not done")
 
-        db_session.query(User).filter(User.user_name == email).update(
-            {"password": generate_password_hash(password), "admin": admin}
-        )
-        db_session.commit()
+        # if email not in users_dict:
+        #     print("user not found")
+        #     return
+
+        # db_session.query(User).filter(User.user_name == email).update(
+        #     {"password": generate_password_hash(password), "admin": admin}
+        # )
+        # db_session.commit()
 
     elif method == "delete":
-        if email not in users_dict or check_password_hash(
-            users_dict[email]["password"], password
-        ):
-            print("user not found or wrong password")
-            return
+        print("delete function not done")
+        # if email not in users_dict or check_password_hash(
+        #     users_dict[email]["password"], password
+        # ):
+        #     print("user not found or wrong password")
+        #     return
 
-        db_session.query(User).filter(User.user_name == email).delete()
-        db_session.commit()
+        # db_session.query(User).filter(User.user_name == email).delete()
+        # db_session.commit()
 
     method = method + "ed" if method[-1] != "e" else method + "d"
     print("new user has been %s:\n%s" % (method, email))
@@ -85,4 +88,4 @@ def add_user(email, password, admin=False, method="insert"):
 
 if __name__ == "__main__":
     args = parser_opt()
-    add_user(args.email, args.password, admin=args.admin, method=args.method)
+    add_user(args.email, args.password, method=args.method)
