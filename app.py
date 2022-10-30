@@ -22,8 +22,17 @@ from flask_form import *
 
 
 app = Flask(__name__)
-
 app.config["SECRET_KEY"] = "eb4d8c3c0bf6ce2125a91c1b71c3f4f7"
+
+# Cache setting
+config = {
+    "DEBUG": True,  # some Flask specific configs
+    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300,
+}
+app.config.from_mapping(config)
+cache = Cache(app)
+cache.init_app(app)
 
 # login
 login_manager = LoginManager()
@@ -76,6 +85,7 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
+    cache.clear()
     limit = 20
     all_trip_count = get_all_trip_count()
     unshown = all_trip_count - limit if all_trip_count > limit else 0
@@ -97,9 +107,7 @@ def trip(id):
 
     if id not in get_trip_id():
         return render_template("404.html")
-
-    Cache.clear()
-
+    cache.clear()
     progress = get_progress(id)
     cancel = get_cancel(id)
 
