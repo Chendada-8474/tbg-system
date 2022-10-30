@@ -15,24 +15,34 @@ from flask_login import (
     logout_user,
     login_required,
 )
-from flask_caching import Cache
 from sql_connector import *
 from data_operate import *
 from flask_form import *
+
+from logging.config import dictConfig
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "eb4d8c3c0bf6ce2125a91c1b71c3f4f7"
 
-# Cache setting
-config = {
-    "DEBUG": True,  # some Flask specific configs
-    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
-    "CACHE_DEFAULT_TIMEOUT": 300,
-}
-app.config.from_mapping(config)
-cache = Cache(app)
-cache.init_app(app)
+dictConfig(
+    {
+        "version": 1,
+        "formatters": {
+            "default": {
+                "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+            }
+        },
+        "handlers": {
+            "wsgi": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://flask.logging.wsgi_errors_stream",
+                "formatter": "default",
+            }
+        },
+        "root": {"level": "INFO", "handlers": ["wsgi"]},
+    }
+)
 
 # login
 login_manager = LoginManager()
@@ -81,19 +91,6 @@ def logout():
     return render_template("login.html")
 
 
-@app.after_request
-def add_header(r):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also to cache the rendered page for 10 minutes.
-    """
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers["Cache-Control"] = "public, max-age=0"
-    return r
-
-
 # app
 @app.route("/", methods=["GET", "POST"])
 @login_required
@@ -116,7 +113,6 @@ def index():
 @app.route("/<int:id>", methods=["GET", "POST"])
 @login_required
 def trip(id):
-
     if id not in get_trip_id():
         return render_template("404.html")
 
@@ -694,6 +690,9 @@ def spot_info(spot_id):
     onespot = get_one_spot_spottype_county(spot_id)
     species = get_spot_species(spot_id)
     num_sp = len(species)
+
+    app.logger.error(onespot[0].description)
+
     return render_template(
         "spot_info.html",
         onespot=onespot,
