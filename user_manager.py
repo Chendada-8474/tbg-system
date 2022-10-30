@@ -30,7 +30,6 @@ def parser_opt():
         choices=["insert", "update", "delete"],
         help="insert, update or delete a user (default as insert)",
     )
-    parser.add_argument("-a", "--admin", action=ap.BooleanOptionalAction)
 
     args = parser.parse_args()
     return args
