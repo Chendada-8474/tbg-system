@@ -6,6 +6,7 @@
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">支出項目</h1>
+        <a href="{{ url_for('new_item') }}"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增項目</button></a>
     </div>
 
     <div>
@@ -22,12 +23,16 @@
             <tbody>
                 {% for i in items %}
                 <tr>
-                    <th scope="row">{{ i.item_id }}</th>
-                    <td>{{ i.item_name }}</td>
-                    <td>{{ i.default_unit_price }}</td>
-                    <td>{{ i.item_class }}</td>
+                    <th scope="row">{{ i[0].item_id }}</th>
+                    <td>{{ i[0].item_name }}</td>
+                    <td>
+                        {% if i[0].default_unit_price %}
+                        {{ i[0].default_unit_price }}
+                        {% endif %}
+                    </td>
+                    <td>{{ i[1].class_name }}</td>
                     <td class="text-center">
-                        <a href=""><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
+                        <a href="{{ url_for('edit_item', item_id = i[0].item_id) }}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -39,8 +44,6 @@
 
 
 </main>
-</div>
-</div>
 
 
 {% endblock %}

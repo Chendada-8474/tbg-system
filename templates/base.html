@@ -115,21 +115,27 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/key-species' %} active {% endif %}" href="{{ url_for('key_species') }}">
-                                <span data-feather="key" class="align-text-bottom"></span>
-                                重點物種
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link {% if request.path == '/item' %} active {% endif %}" href="{{ url_for('item') }}">
                                 <span data-feather="shopping-bag" class="align-text-bottom"></span>
                                 支出項目
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/admin-cost' %} active {% endif %}" href="{{ url_for('admin_cost') }}">
+                                <span data-feather="briefcase" class="align-text-bottom"></span>
+                                行政支出
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {% if request.path == '/partner' %} active {% endif %}" href="{{ url_for('partner') }}">
                                 <span data-feather="meh" class="align-text-bottom"></span>
                                 TBG 成員資訊
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/key-species' %} active {% endif %}" href="{{ url_for('key_species') }}">
+                                <span data-feather="key" class="align-text-bottom"></span>
+                                重點物種
                             </a>
                         </li>
                         <li class="nav-item">

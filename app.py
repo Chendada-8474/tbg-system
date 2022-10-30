@@ -7,6 +7,7 @@ from flask import (
     request,
 )
 from datetime import date
+from importlib_metadata import method_cache
 from werkzeug.security import check_password_hash
 from flask_login import (
     LoginManager,
@@ -306,16 +307,21 @@ def customer_deleted(id):
     return render_template("customer_deleted.html", trip_id=trip_id)
 
 
-@app.route("/<int:id>/new-expenditure", methods=["GET", "POST"])
+@app.route("/<int:trip_id>/new-expenditure", methods=["GET", "POST"])
 @login_required
-def new_expenditure(id):
+def new_expenditure(trip_id):
     update_done = False
     exp_form = expenditure_form()
+    item_classes = get_item_class_selection()
     if exp_form.validate_on_submit():
-        insert_expenditure(exp_form, id)
+        insert_expenditure(exp_form, trip_id=trip_id)
         update_done = True
     return render_template(
-        "new_expenditure.html", trip_id=id, exp_form=exp_form, update_done=update_done
+        "new_expenditure.html",
+        trip_id=trip_id,
+        exp_form=exp_form,
+        update_done=update_done,
+        item_classes=item_classes,
     )
 
 
@@ -325,6 +331,7 @@ def new_expenditure(id):
 @login_required
 def edit_expenditure(trip_id, expenditure_id):
     update_done = False
+    item_classes = get_item_class_selection()
     exp_info = get_one_expenditure(expenditure_id)
     exp_form = expenditure_form(
         item_def=exp_info.item_id, advancer_def=exp_info.advancer
@@ -340,7 +347,19 @@ def edit_expenditure(trip_id, expenditure_id):
         exp_info=exp_info,
         exp_form=exp_form,
         update_done=update_done,
+        item_classes=item_classes,
     )
+
+
+@app.route("/live-item-class", methods=["GET", "POST"])
+@login_required
+def live_item_class():
+    response_filter = request.get_json("item_class")
+    item_class_selection = get_item_selection(
+        item_class_id=int(response_filter["item_class"])
+    )
+    item_class_selection = {"item_class": item_class_selection}
+    return jsonify(item_class_selection)
 
 
 @app.route(
@@ -455,6 +474,38 @@ def edit_spot(spot_id):
 def item():
     items = get_item()
     return render_template("item.html", items=items)
+
+
+@app.route("/edit-item/<int:item_id>", methods=["POST", "GET"])
+@login_required
+def edit_item(item_id):
+    update_done = False
+
+    item_info = get_item(item_id=item_id)
+    form = item_form(item_class_def=item_info[0].item_class_id)
+
+    if form.validate_on_submit():
+        update_item(item_id, form)
+        update_done = True
+
+    return render_template(
+        "edit_item.html",
+        update_done=update_done,
+        form=form,
+        item_info=item_info,
+    )
+
+
+@app.route("/new-item", methods=["POST", "GET"])
+@login_required
+def new_item():
+    update_done = False
+    form = item_form()
+    if form.validate_on_submit():
+        insert_item(form)
+        update_done = True
+
+    return render_template("new_item.html", form=form, update_done=update_done)
 
 
 @app.route("/itinerary")
@@ -706,9 +757,9 @@ def key_species():
 @app.route("/car", methods=["GET", "POST"])
 @login_required
 def car():
-    cars = get_car()
     if request.method == "POST":
         delete_car(int(request.form["car_id"]))
+    cars = get_car()
     return render_template("car.html", cars=cars)
 
 
@@ -721,8 +772,41 @@ def new_car():
     if form.validate_on_submit():
         insert_car(form)
         inserted = True
+        return redirect(url_for("car"))
 
     return render_template("new_car.html", form=form, inserted=inserted)
+
+
+@app.route("/admin-cost", methods=["GET", "POST"])
+def admin_cost():
+    admin_costs = get_admin_cost()
+
+    if request.method == "POST":
+        if request.form["admin_operate"] == "select_all":
+            admin_costs = get_admin_cost(limit=9999)
+        else:
+            delete_expenditure(int(request.form["admin_operate"]))
+
+    return render_template("admin_cost.html", admin_costs=admin_costs)
+
+
+@app.route("/new-admin-cost", methods=["GET", "POST"])
+def new_admin_cost():
+    inserted = False
+    form = expenditure_form()
+    item_classes = get_item_class_selection()
+
+    if form.validate_on_submit():
+        insert_expenditure(form)
+        inserted = True
+        return redirect(url_for("admin_cost"))
+
+    return render_template(
+        "new_admin_cost.html",
+        inserted=inserted,
+        item_classes=item_classes,
+        form=form,
+    )
 
 
 @app.errorhandler(404)

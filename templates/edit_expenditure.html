@@ -19,9 +19,18 @@
 
         <div class="row pt-1 pb-2 mb-3">
             <div class="row py-2">
+                <div class="col-lg-3">
+                    <label class="form-label" for="item_class">項目類別篩選</label>
+                    <select class="form-control" name="item_class" id="item_class">
+                        <option value="">-- 類別 --</option>
+                        {% for i in item_classes %}
+                        <option value="{{ i.[0] }}">{{ i.[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="col-lg-2">
                     {{exp_form.item_id.label(class="form-label")}}
-                    {{exp_form.item_id(class="form-control")}}
+                    {{exp_form.item_id(class="form-control", id="itemId")}}
                 </div>
                 <div class="col-lg-2">
                     {{exp_form.unit_price.label(class="form-label")}}
@@ -62,8 +71,11 @@
     </div>
 
 </main>
-</div>
-</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script src="{{ url_for('static', filename='js/item_class_filter.js')}}"></script>
 
 
 {% endblock %}

@@ -17,7 +17,6 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, NumberRange, Email, Optional
 from sql_connector import (
-    get_car,
     get_country,
     get_county_selection,
     get_itinerary_selection,
@@ -28,6 +27,7 @@ from sql_connector import (
     get_car_selection,
     get_bank_selection,
     get_item_selection,
+    get_item_class_selection,
 )
 
 
@@ -89,7 +89,7 @@ class CustomerForm(BaseForm):
 
 def new_trip_form(num_cus):
 
-    partners = [(i[0], "%s %s" % (i[1], i[2])) for i in get_partner_selection()]
+    partners = get_partner_selection()
 
     cars = get_car_selection()
 
@@ -195,7 +195,7 @@ def update_trip_form(
     itinerary_def="",
 ):
 
-    partners = [(i[0], "%s %s" % (i[1], i[2])) for i in get_partner_selection()]
+    partners = get_partner_selection()
 
     cars = get_car_selection()
 
@@ -365,17 +365,45 @@ def update_customer_form(gender_def=None, country_def=None, note_def=""):
     return CustomerForm()
 
 
+def item_form(item_class_def=None):
+
+    item_classes = get_item_class_selection()
+
+    class ItemForm(FlaskForm):
+        item_name = StringField("支出項目名稱", validators=[DataRequired()])
+        unit = StringField("單位", validators=[Optional(strip_whitespace=True)])
+        default_unit_price = IntegerField(
+            "預設單價",
+            validators=[
+                NumberRange(min=1, max=999999),
+                Optional(strip_whitespace=True),
+            ],
+        )
+        item_class_id = SelectField(
+            "項目類型", choices=item_classes, default=item_class_def
+        )
+        create_button = SubmitField("新增")
+        update_button = SubmitField("更新資訊")
+
+    return ItemForm()
+
+
 def expenditure_form(item_def=None, advancer_def=None):
-    items = [(i[0], i[1]) for i in get_item_selection()]
-    partner = [(i[0], "%s %s" % (i[1], i[2])) for i in get_partner_selection()]
-    partner.insert(0, (None, ""))
+    items = get_item_selection()
+    partner = get_partner_selection()
+    partner.insert(0, ("", "-- 代墊人 --"))
 
     class ExpenditureForm(FlaskForm):
         item_id = SelectField("支出項目", choices=items, default=item_def)
-        unit_price = IntegerField("單價", validators=[DataRequired()])
+        unit_price = FloatField("單價", validators=[DataRequired()])
         quantity = IntegerField("數量", validators=[DataRequired()])
         date = DateField("日期", validators=[DataRequired()])
-        advancer = SelectField("代墊人", choices=partner, default=advancer_def)
+        advancer = SelectField(
+            "代墊人",
+            choices=partner,
+            default=advancer_def,
+            validators=[Optional(strip_whitespace=True)],
+        )
         note = StringField("備註")
         create_expenditure = SubmitField("新增支出")
         update_expenditure = SubmitField("儲存變更")

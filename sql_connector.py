@@ -52,6 +52,10 @@ class Item(Base):
     __table__ = Base.metadata.tables["item"]
 
 
+class ItemClass(Base):
+    __table__ = Base.metadata.tables["item_class"]
+
+
 class Country(Base):
     __table__ = Base.metadata.tables["country"]
 
@@ -324,9 +328,45 @@ def get_cancel(id):
     return canceled[0]
 
 
-def get_item():
-    item = db_session.query(Item).all()
+def get_item(item_id=None):
+    if item_id:
+        item = (
+            db_session.query(Item, ItemClass)
+            .join(ItemClass, ItemClass.item_class_id == Item.item_class_id)
+            .filter(Item.item_id == item_id)
+            .first()
+        )
+
+    else:
+        item = (
+            db_session.query(Item, ItemClass)
+            .join(ItemClass, ItemClass.item_class_id == Item.item_class_id)
+            .all()
+        )
     return item
+
+
+def update_item(item_id: int, form):
+    db_session.query(Item).filter(Item.item_id == item_id).update(
+        {
+            "item_name": form.item_name.data,
+            "unit": form.unit.data,
+            "default_unit_price": form.default_unit_price.data,
+            "item_class_id": form.item_class_id.data,
+        }
+    )
+    db_session.commit()
+
+
+def insert_item(form):
+    new_item = Item(
+        item_name=form.item_name.data,
+        unit=form.unit.data,
+        default_unit_price=form.default_unit_price.data,
+        item_class_id=form.item_class_id.data,
+    )
+    db_session.add(new_item)
+    db_session.commit()
 
 
 def update_progress(trip_id: int, progress: list, how=None):
@@ -392,6 +432,8 @@ def get_partner_selection():
     partners = db_session.query(
         Partner.partner_id, Partner.first_name, Partner.last_name
     ).all()
+    partners = [(i[0], "%s %s" % (i[1], i[2])) for i in partners]
+
     return partners
 
 
@@ -412,11 +454,29 @@ def get_currency_selection():
     return currencies
 
 
-def get_item_selection():
-    items = (
-        db_session.query(Item.item_id, Item.item_name).order_by(Item.item_class).all()
-    )
+def get_item_selection(item_class_id=None):
+    if not item_class_id:
+        items = db_session.query(Item.item_id, Item.item_name).all()
+
+    else:
+        items = (
+            db_session.query(Item.item_id, Item.item_name)
+            .filter(Item.item_class_id == item_class_id)
+            .all()
+        )
+
+    items = [(i[0], i[1]) for i in items]
     return items
+
+
+def get_item_class_selection():
+    item_classes = db_session.query(ItemClass).all()
+    item_classes = [
+        (i.item_class_id, ("%s %s" % (i.class_name, i.class_ch_name)))
+        for i in item_classes
+    ]
+
+    return item_classes
 
 
 def get_car_selection(brand_id=None):
@@ -757,8 +817,9 @@ def get_trip_id_of_customer(customer_id: int):
 
 def get_expenditure_of_trip(trip_id):
     expend = (
-        db_session.query(Expenditure, Item, Partner)
+        db_session.query(Expenditure, Item, Partner, ItemClass)
         .join(Item, Item.item_id == Expenditure.item_id)
+        .join(ItemClass, ItemClass.item_class_id == Item.item_class_id)
         .outerjoin(Partner, Partner.partner_id == Expenditure.advancer)
         .filter(Expenditure.trip_id == trip_id)
         .all()
@@ -775,9 +836,9 @@ def get_one_expenditure(expenditure_id):
     return expenditure
 
 
-def insert_expenditure(exp_from, trip_id: int):
+def insert_expenditure(exp_from, trip_id=None):
 
-    if exp_from.advancer.data != "None":
+    if exp_from.advancer.data != "":
         new_expenditure = Expenditure(
             trip_id=trip_id,
             item_id=exp_from.item_id.data,
@@ -1237,6 +1298,21 @@ def delete_car(car_id: int):
     db_session.commit()
 
 
+def get_admin_cost(limit=50):
+    admin_cost = (
+        db_session.query(Expenditure, Item, ItemClass, Partner)
+        .filter(Expenditure.trip_id == None)
+        .outerjoin(Partner, Partner.partner_id == Expenditure.advancer)
+        .join(Item, Item.item_id == Expenditure.item_id)
+        .join(ItemClass, Item.item_class_id == ItemClass.item_class_id)
+        .order_by(desc(Expenditure.date))
+        .limit(limit)
+        .all()
+    )
+
+    return admin_cost
+
+
 if __name__ == "__main__":
-    query = get_car_brand_selection()
-    print(query)
+    query = get_item(item_id=44)
+    print(query[0].item_name)

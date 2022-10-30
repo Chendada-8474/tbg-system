@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">行政支出</h1>
+        <a href="{{ url_for('new_admin_cost') }}"><button type="button" class="btn btn-primary"><span data-feather="user-plus"></span> 新增行政支出</button></a>
+    </div>
+
+    <form action="" method="POST">
+
+        <table class="table table-striped table-hover mb-3">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">項目</th>
+                    <th scope="col">單價</th>
+                    <th scope="col">數量</th>
+                    <th scope="col">總價</th>
+                    <th scope="col">日期</th>
+                    <th scope="col">分類</th>
+                    <th scope="col">代墊人</th>
+                    <th scope="col">Note</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in admin_costs %}
+                <tr>
+                    <th scope="row">{{ a[0].expenditure_id }}</th>
+                    <td>{{ a[1].item_name }}</td>
+                    <td>
+                        {{ a[0].unit_price }}
+                    </td>
+                    <td>
+                        {{ a[0].quantity }}
+                    </td>
+                    <td>{{ a[0].unit_price * a[0].quantity }}</td>
+                    <td>{{ a[0].date }}</td>
+                    <td>{{ a[2].class_name }}</td>
+                    <td>{{ a[3].ch_last_name }}{{ a[3].ch_first_name }}</td>
+                    <td class="text-center">
+
+                        <button type="submit" name="admin_operate" class="btn btn-outline-danger py-0 px-1" value="{{ a[0].expenditure_id }}">
+                            <span data-feather="delete" class="align-text-bottom"></span>
+                        </button>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary" name="admin_operate" , value="select_all">顯示全部</button>
+
+    </form>
+
+
+
+</main>
+
+
+{% endblock %}

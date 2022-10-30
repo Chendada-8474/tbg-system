@@ -9,7 +9,7 @@
     </div>
     {% if update_done %}
     <div class="alert alert-success" role="alert">
-        支出項目已經成功更新，<a href="{{ url_for('item') }}">回到支出項目資訊</a>
+        支出項目已經成功新增，<a href="{{ url_for('item') }}">回到行程資訊</a>
     </div>
     {% else %}
 
@@ -22,19 +22,15 @@
                 <div class="row py-2">
                     <div class="col-lg-2">
                         {{form.item_name.label(class="form-label")}}
-                        {{form.item_name(class="form-control", value=item_info[0].item_name)}}
+                        {{form.item_name(class="form-control")}}
                     </div>
                     <div class="col-lg-2">
                         {{form.unit.label(class="form-label")}}
-                        {% if item_info[0].unit %}
-                        {{form.unit(class="form-control", value=item_info[0].unit)}}
-                        {% else %}
                         {{form.unit(class="form-control")}}
-                        {% endif %}
                     </div>
                     <div class="col-lg-2">
                         {{form.default_unit_price.label(class="form-label")}}
-                        {{form.default_unit_price(class="form-control", value=item_info[0].default_unit_price)}}
+                        {{form.default_unit_price(class="form-control")}}
                     </div>
                     <div class="col-lg-3">
                         {{form.item_class_id.label(class="form-label")}}
@@ -45,21 +41,9 @@
             </div>
         </div>
 
-
-        {{form.update_button(class="btn btn-primary")}}
+        {{form.create_button(class="btn btn-primary")}}
     </form>
-
-
-    <br>
-
-    <div class="shadow-sm alert alert-danger p-3">
-        <form action="" , method="POST">
-            <button type="submit" class="btn btn-danger" name="delete_buttom" value="delete">刪除</button>
-        </form>
-    </div>
-
     {% endif %}
-
 
 </main>
 
