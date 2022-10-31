@@ -799,13 +799,13 @@ def new_car():
 
 @app.route("/admin-cost", methods=["GET", "POST"])
 def admin_cost():
-    admin_costs = get_admin_cost()
 
     if request.method == "POST":
         if request.form["admin_operate"] == "select_all":
             admin_costs = get_admin_cost(limit=9999)
         else:
             delete_expenditure(int(request.form["admin_operate"]))
+    admin_costs = get_admin_cost()
 
     return render_template("admin_cost.html", admin_costs=admin_costs)
 
