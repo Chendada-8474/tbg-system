@@ -18,9 +18,14 @@ from flask_login import (
 from sql_connector import *
 from data_operate import *
 from flask_form import *
-
 from logging.config import dictConfig
 
+# from telegram.ext import ExtBot
+# from datetime import datetime
+
+# TG_TOKEN = "1939444551:AAGMhwpv2fSRr9754acg2OIEMJZBfyVxRzs"
+# ADMIN_CHAT_ID = "348929573"
+# bot = ExtBot(TG_TOKEN)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "eb4d8c3c0bf6ce2125a91c1b71c3f4f7"
@@ -330,7 +335,9 @@ def new_expenditure(trip_id):
     update_done = False
     exp_form = expenditure_form()
     item_classes = get_item_class_selection()
+
     if exp_form.validate_on_submit():
+
         insert_expenditure(exp_form, trip_id=trip_id)
         update_done = True
     return render_template(
@@ -836,4 +843,5 @@ def page_not_found(e):
 
 
 if __name__ == "__main__":
+
     app.run(host="0.0.0.0", port=80)

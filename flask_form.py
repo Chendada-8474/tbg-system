@@ -391,7 +391,7 @@ def expenditure_form(item_def=None, advancer_def=None):
     class ExpenditureForm(FlaskForm):
         item_id = SelectField("支出項目", choices=items, default=item_def)
         unit_price = FloatField("單價", validators=[DataRequired()])
-        quantity = IntegerField("數量", validators=[DataRequired()])
+        quantity = IntegerField("數量", validators=[DataRequired(), NumberRange(min=1)])
         date = DateField("日期", validators=[DataRequired()])
         advancer = SelectField(
             "代墊人",

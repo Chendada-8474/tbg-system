@@ -281,14 +281,14 @@
             </table>
 
             <div class="d-flex flex-wrap">
-                {% if trip_info[0].accounted == 1 %}
+
                 {% if profit %}
                 <h5 class="m-3">總支出: <span>{{total_expand}} TWD</span></h5>
                 <h5 class="m-3">利潤: <span class="{% if profit > 0 %}text-success{% elif profit < 0 %}text-danger{% else %}text-warning{% endif %}">{{profit}} TWD</span></h5>
                 {% else %}
                 <p>尚未輸入匯率</p>
                 {% endif %}
-                {% endif %}
+
             </div>
         </div>
     </div>

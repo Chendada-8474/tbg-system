@@ -836,6 +836,20 @@ def get_expenditure_of_trip(trip_id):
     return expend
 
 
+def get_expenditure_of_trip_expenditure(trip_id):
+    expend = (
+        db_session.query(Expenditure, Item, Partner, ItemClass)
+        .join(Item, Item.item_id == Expenditure.item_id)
+        .join(ItemClass, ItemClass.item_class_id == Item.item_class_id)
+        .outerjoin(Partner, Partner.partner_id == Expenditure.advancer)
+        .filter(Expenditure.trip_id == trip_id)
+        .order_by(desc(Expenditure.date))
+        .limit(10)
+        .all()
+    )
+    return expend
+
+
 def get_one_expenditure(expenditure_id):
     expenditure = (
         db_session.query(Expenditure)
