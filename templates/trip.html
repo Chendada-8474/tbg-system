@@ -2,11 +2,6 @@
 
 
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script>
-    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
-    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl))
-</script>
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <!-- <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -262,7 +257,12 @@
                         <th scope="col">總價</th>
                         <th scope="col">日期</th>
                         <th scope="col">代墊人</th>
-                        <th scope="col">備註</th>
+                        <th scope="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="noteShow">
+                                <label class="form-check-label" for="noteShow">備註</label>
+                            </div>
+                        </th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -276,15 +276,11 @@
                         <td>{{ e[0].quantity * e[0].unit_price }}</td>
                         <td>{{ e[0].date }}</td>
                         <td>{{ e[2].ch_last_name }}{{e[2].ch_first_name}}</td>
-
                         <td>
-                            <button type="button" class="btn btn-secondary" data-bs-container="body" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="Bottom popover">
-                                Popover on bottom
-                            </button>
+                            <span class="show-note" hidden>{{ e[0].note }}</span>
+                            <span class="hide-note">...</span>
+
                         </td>
-
-
-
                         <td class="text-center">
                             <a href="/{{trip_id}}/edit-expenditure/{{e[0].expenditure_id}}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
                         </td>
@@ -357,5 +353,22 @@
 
 
 </main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#noteShow").on('change', function () {
+            isChecked = $(this).is(":checked")
+            if (isChecked) {
+                $(".show-note").removeAttr('hidden')
+                $(".hide-note").attr('hidden', true)
+            } else {
+                $(".hide-note").removeAttr('hidden')
+                $(".show-note").attr('hidden', true)
+            }
+        })
+    })
+</script>
 
 {% endblock %}
