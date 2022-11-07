@@ -15,21 +15,20 @@
             </a>
         </div>
     </div>
-
-    <div class="d-flex flex-wrap my-3">
-        <p class="bg-primary rounded-5 text-white px-2 m-1">{{ onespot[2].county_en_name }}</p>
-        <p class="bg-secondary rounded-5 text-white px-2 m-1">{{ onespot[1].type }}</p>
+    <div class="d-flex flex-row my-3">
+        <p class="badge rounded-pill text-bg-primary px-2 m-1">{{ onespot[2].county_en_name }}</p>
+        <p class="badge rounded-pill text-bg-secondary px-2 m-1">{{ onespot[1].type }}</p>
         {% if onespot[0].spring == 1 %}
-        <p class="bg-success rounded-5 text-white px-2 m-1">春</p>
+        <span class="badge rounded-pill text-bg-primary pt-1 m-1">春</span>
         {% endif %}
         {% if onespot[0].summer == 1 %}
-        <p class="bg-danger rounded-5 text-white px-2 m-1">夏</p>
+        <span class="badge rounded-pill text-bg-danger m-1">夏</span>
         {% endif %}
         {% if onespot[0].autumn == 1 %}
-        <p class="bg-warning rounded-5 text-white px-2 m-1">秋</p>
+        <span class="badge rounded-pill text-bg-warning text-white m-1">秋</span>
         {% endif %}
         {% if onespot[0].winter == 1 %}
-        <p class="bg-info rounded-5 text-white px-2 m-1">冬</p>
+        <span class="badge rounded-pill text-bg-info text-white m-1">冬</span>
         {% endif %}
     </div>
 

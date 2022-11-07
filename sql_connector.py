@@ -126,6 +126,20 @@ def get_one_company(company_id):
 
 
 def get_index_table(limit=5):
+
+    statment = case(
+        [
+            (
+                func.current_date().between(
+                    Trip.starting_date,
+                    func.ADDDATE(Trip.starting_date, Trip.number_of_days),
+                ),
+                1,
+            )
+        ],
+        else_=0,
+    )
+
     trip = (
         db_session.query(
             Trip.trip_id,
@@ -143,6 +157,7 @@ def get_index_table(limit=5):
             Trip.deposit,
             Trip.to_quote,
             Trip.cancel,
+            statment,
         )
         .join(Customer, Trip.contact_client == Customer.customer_id)
         .join(Partner, Trip.guide == Partner.partner_id)
@@ -164,7 +179,7 @@ def get_index_table(limit=5):
             else:
                 status = "draft"
         index_trip.append(
-            (t[0], cus_name, t[3], t[4], t[5], gui_name, t[8], status, t[14])
+            (t[0], cus_name, t[3], t[4], t[5], gui_name, t[8], status, t[14], t[15])
         )
 
     return index_trip

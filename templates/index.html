@@ -48,7 +48,12 @@
         {% for t in trip %}
         <tr>
           <td>{{t[0]}}</td>
-          <td>{{t[1]}}</td>
+          <td class="d-flex flex-row">
+            <span>{{t[1]}}</span>
+            {% if t[9] == 1 %}
+            <span class="badge rounded-pill text-bg-info text-white ms-2">in progress</span>
+            {% endif %}
+          </td>
           <td>
             {% if t[8] == 1 %}
             <span class="badge bg-danger rounded-pill">

@@ -112,6 +112,7 @@ def index():
         trip = get_index_table(limit=limit)
 
     pre_form = PreNumberOfCustomer()
+
     return render_template("index.html", trip=trip, pre_form=pre_form, unshown=unshown)
 
 
@@ -842,10 +843,10 @@ def page_not_found(e):
     return render_template("404.html", err=e), 404
 
 
-@app.errorhandler(Exception)
-def internal_error(error):
-    bot.send_message(ADMIN_CHAT_ID, text=abort_msg(error))
-    return render_template("error.html", error=error)
+# @app.errorhandler(Exception)
+# def internal_error(error):
+#     bot.send_message(ADMIN_CHAT_ID, text=abort_msg(error))
+#     return render_template("error.html", error=error)
 
 
 if __name__ == "__main__":
