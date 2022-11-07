@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">系統發生了一些錯誤QQ</h1>
+    </div>
+    <P class="mb-3">系統已自動通知管理員，請靜待錯誤排除，稍後在試。</P>
+    <div class="alert alert-danger" role="alert">
+        <h6>ERROR:</h6>
+        {{ error }}
+    </div>
+
+</main>
+</div>
+</div>
+
+
+{% endblock %}

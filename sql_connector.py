@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, desc, case, and_
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import func
+from sqlalchemy.pool import QueuePool
 from datetime import date
 import yaml
 
@@ -15,6 +16,8 @@ MYSQL_DB_NAME = connection_info["mysql"]["database_name"]
 engine = create_engine(
     "mysql+pymysql://root:%s@%s/%s" % (MYSQL_PW, MYSQL_IP, MYSQL_DB_NAME),
     isolation_level="AUTOCOMMIT",
+    poolclass=QueuePool,
+    pool_recycle=3600,
 )
 
 Base = declarative_base()

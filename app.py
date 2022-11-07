@@ -19,13 +19,13 @@ from sql_connector import *
 from data_operate import *
 from flask_form import *
 from logging.config import dictConfig
+from abort_error import abort_msg
 
-# from telegram.ext import ExtBot
-# from datetime import datetime
+from telegram.ext import ExtBot
 
-# TG_TOKEN = "1939444551:AAGMhwpv2fSRr9754acg2OIEMJZBfyVxRzs"
-# ADMIN_CHAT_ID = "348929573"
-# bot = ExtBot(TG_TOKEN)
+TG_TOKEN = "5655440966:AAHPZsOA9BoEzlvuYHj9YsxT8NFpQ_Ooz14"
+ADMIN_CHAT_ID = "348929573"
+bot = ExtBot(TG_TOKEN)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "eb4d8c3c0bf6ce2125a91c1b71c3f4f7"
@@ -100,10 +100,10 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
+
     limit = 20
     all_trip_count = get_all_trip_count()
     unshown = all_trip_count - limit if all_trip_count > limit else 0
-
     if request.method == "POST":
         if request.form["all_button"] == "select_all":
             trip = get_index_table(limit=9999)
@@ -842,6 +842,11 @@ def page_not_found(e):
     return render_template("404.html", err=e), 404
 
 
-if __name__ == "__main__":
+@app.errorhandler(Exception)
+def internal_error(error):
+    bot.send_message(ADMIN_CHAT_ID, text=abort_msg(error))
+    return render_template("error.html", error=error)
 
-    app.run(host="0.0.0.0", port=80)
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=False)
