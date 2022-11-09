@@ -359,7 +359,9 @@ def edit_expenditure(trip_id, expenditure_id):
     item_classes = get_item_class_selection()
     exp_info = get_one_expenditure(expenditure_id)
     exp_form = expenditure_form(
-        item_def=exp_info.item_id, advancer_def=exp_info.advancer
+        item_def=exp_info.item_id,
+        advancer_def=exp_info.advancer,
+        receipt_def=exp_info.receipt,
     )
     if exp_form.validate_on_submit():
         update_expenditure(expenditure_id, exp_form)
