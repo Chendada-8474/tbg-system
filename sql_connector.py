@@ -916,7 +916,6 @@ def get_one_itinerary_spot(itin_id: int):
     itinerary = (
         db_session.query(Itinerary, Spot)
         .join(Spot, Itinerary.spot_id == Spot.spot_id)
-        .join(Trip, Itinerary.itinerary_id == Trip.itinerary_id)
         .filter(Itinerary.itinerary_id == itin_id)
         .all()
     )
@@ -1354,5 +1353,5 @@ def get_admin_cost(limit=50):
 
 
 if __name__ == "__main__":
-    query = get_item(item_id=44)
-    print(query[0].item_name)
+    query = get_one_itinerary_spot(7)
+    print(query)
