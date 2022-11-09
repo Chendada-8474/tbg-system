@@ -11,13 +11,19 @@
     <div class="alert alert-success" role="alert">
         支出項目已經成功增加，<a href="/{{trip_id}}">回到行程資訊</a>
     </div>
-    {% endif %}
+    {% else %}
+    <div class="shadow-sm bg-light p-3 mb-3 rounded-2">
+        <form action="" method="POST">
+            {{ exp_form.csrf_token }}
+            {{ exp_form.hidden_tag() }}
 
-    <form action="" method="POST">
-        {{ exp_form.csrf_token }}
-        {{ exp_form.hidden_tag() }}
+            <div class="row py-2">
+                <div class="col-lg-3">
+                    {{exp_form.receipt(class="form-check-input")}}
+                    {{exp_form.receipt.label(class="form-check-label")}}
+                </div>
+            </div>
 
-        <div class="row pt-1 pb-2 mb-3">
             <div class="row py-2">
                 <div class="col-lg-3">
                     <label class="form-label" for="item_class">項目類別篩選</label>
@@ -56,11 +62,10 @@
                 </div>
             </div>
 
-        </div>
+            {{exp_form.update_expenditure(class="btn btn-primary mt-4")}}
+        </form>
 
-
-        {{exp_form.update_expenditure(class="btn btn-primary")}}
-    </form>
+    </div>
 
     <br>
 
@@ -69,6 +74,7 @@
             <button type="submit" class="btn btn-danger" name="delete_buttom" value="delete">刪除</button>
         </form>
     </div>
+    {% endif %}
 
 </main>
 

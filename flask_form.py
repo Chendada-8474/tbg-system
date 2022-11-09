@@ -383,7 +383,11 @@ def item_form(item_class_def=None):
     return ItemForm()
 
 
-def expenditure_form(item_def=None, advancer_def=None):
+def expenditure_form(
+    item_def=None,
+    advancer_def=None,
+    receipt_def=False,
+):
     items = get_item_selection()
     partner = get_partner_selection()
     partner.insert(0, ("", "-- 代墊人 --"))
@@ -399,6 +403,7 @@ def expenditure_form(item_def=None, advancer_def=None):
             default=advancer_def,
             validators=[Optional(strip_whitespace=True)],
         )
+        receipt = BooleanField("收據", default=receipt_def)
         note = StringField("備註")
         create_expenditure = SubmitField("新增支出")
         update_expenditure = SubmitField("儲存變更")

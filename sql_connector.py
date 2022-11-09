@@ -802,6 +802,7 @@ def update_expenditure(expenditure_id, form):
                 "quantity": form.quantity.data,
                 "date": form.date.data,
                 "note": form.note.data,
+                "receipt": form.receipt.data,
                 "advancer": form.advancer.data,
             }
         )
@@ -815,6 +816,7 @@ def update_expenditure(expenditure_id, form):
                 "quantity": form.quantity.data,
                 "date": form.date.data,
                 "note": form.note.data,
+                "receipt": form.receipt.data,
             }
         )
     db_session.commit()
@@ -885,6 +887,7 @@ def insert_expenditure(exp_from, trip_id=None):
             unit_price=exp_from.unit_price.data,
             quantity=exp_from.quantity.data,
             date=exp_from.date.data,
+            receipt=exp_from.receipt.data,
             note=exp_from.note.data,
             advancer=exp_from.advancer.data,
         )
@@ -895,6 +898,7 @@ def insert_expenditure(exp_from, trip_id=None):
             unit_price=exp_from.unit_price.data,
             quantity=exp_from.quantity.data,
             date=exp_from.date.data,
+            receipt=exp_from.receipt.data,
             note=exp_from.note.data,
         )
 
