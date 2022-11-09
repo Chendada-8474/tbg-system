@@ -1,4 +1,5 @@
-const expTable = document.querySelector('#expenditure')
+const getExpTable = document.querySelector('#expenditure')
+var expTable = getExpTable.cloneNode(true)
 
 var hideNote = expTable.getElementsByClassName("hide-note")
 while (hideNote[0]) {
