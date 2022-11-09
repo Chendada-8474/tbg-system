@@ -33,7 +33,7 @@ const BOM = '\uFEFF'; // utf-8 byte-order-mark
 const csvBlob = new Blob([BOM + content], { type: 'text/csv;charset=utf-8' });
 
 const tripDate = document.getElementById("start_date").textContent
-const tripName = document.getElementById("trip_name").textContent.replace(" ", "_")
+const tripName = document.getElementById("trip_name").textContent.replace(/ /g, "_")
 const fileName = tripDate + "_" + tripName
 
 function download() {
