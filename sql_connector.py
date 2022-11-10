@@ -15,8 +15,9 @@ MYSQL_DB_NAME = connection_info["mysql"]["database_name"]
 
 engine = create_engine(
     "mysql+pymysql://root:%s@%s/%s" % (MYSQL_PW, MYSQL_IP, MYSQL_DB_NAME),
-    isolation_level="AUTOCOMMIT",
     pool_recycle=3600,
+    pool_pre_ping=True,
+    isolation_level="AUTOCOMMIT",
 )
 
 Base = declarative_base()
