@@ -2,7 +2,6 @@ from sqlalchemy import create_engine, desc, case, and_
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.expression import func
-from sqlalchemy.pool import QueuePool
 from datetime import date
 import yaml
 
@@ -15,10 +14,11 @@ MYSQL_DB_NAME = connection_info["mysql"]["database_name"]
 
 engine = create_engine(
     "mysql+pymysql://root:%s@%s/%s" % (MYSQL_PW, MYSQL_IP, MYSQL_DB_NAME),
-    pool_recycle=3600,
+    pool_recycle=-1,
     pool_pre_ping=True,
     isolation_level="AUTOCOMMIT",
 )
+
 
 Base = declarative_base()
 Base.metadata.reflect(engine)
@@ -132,7 +132,7 @@ def get_index_table(limit=5):
             (
                 func.current_date().between(
                     Trip.starting_date,
-                    func.ADDDATE(Trip.starting_date, Trip.number_of_days),
+                    func.ADDDATE(Trip.starting_date, Trip.number_of_days - 1),
                 ),
                 1,
             )

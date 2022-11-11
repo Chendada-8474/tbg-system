@@ -62,6 +62,11 @@ class LoginUser(UserMixin):
     pass
 
 
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
+
+
 @login_manager.user_loader
 def load_user(user_login):
     if user_login not in users:
