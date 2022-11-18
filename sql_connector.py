@@ -1357,6 +1357,17 @@ def get_admin_cost(limit=50):
     return admin_cost
 
 
+def get_trip_key_species(trip_id):
+    sql = (
+        """
+        SELECT species_spot.spot_id, species_spot.key_species_id, spot.spot_name, spot.spot_ch_name, key_species.en_common_name, key_species.ch_common_name, key_species.endemic FROM taiwanbirdguide.species_spot LEFT JOIN taiwanbirdguide.spot ON species_spot.spot_id = spot.spot_id LEFT JOIN taiwanbirdguide.key_species ON species_spot.key_species_id = key_species.key_species_id WHERE species_spot.spot_id IN (SELECT spot_id FROM taiwanbirdguide.itinerary, (SELECT itinerary_id FROM taiwanbirdguide.trip WHERE trip_id = %s) AS itid WHERE itinerary.itinerary_id = itid.itinerary_id GROUP BY spot_id) ORDER BY species_spot.spot_id;
+        """
+        % trip_id
+    )
+    itinerary_species = db_session.execute(sql).fetchall()
+    return itinerary_species
+
+
 if __name__ == "__main__":
-    query = get_one_itinerary_spot(7)
+    query = get_trip_key_species(12)
     print(query)

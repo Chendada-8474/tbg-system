@@ -51,11 +51,11 @@
                         <label class="form-check-label" for="flexSwitchCheckChecked">住宿</label>
                         <input type="hidden" value="accommodationCheckBox">
                     </div>
-                    <!-- <div class="form-check form-switch">
+                    <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" checked>
                         <label class="form-check-label" for="flexSwitchCheckChecked">重點物種</label>
                         <input type="hidden" value="speciesCheckBox">
-                    </div> -->
+                    </div>
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" checked>
                         <label class="form-check-label" for="flexSwitchCheckChecked">匯款資訊</label>
@@ -565,7 +565,7 @@
             </div>
 
         </section>
-        <!--
+
         <section id="speciesCheckBox">
             <spen class="break-page">
                 <div class="border border-secondary quote-page">
@@ -579,10 +579,24 @@
                                 <span class="chinese" hidden>重點物種</span>
                             </h4>
                         </div>
+                        <div class="mb-5">
+                            {% for is in itinerary_species %}
+                            {% if itinerary_species[loop.index-2][0] != is[0] %}
+                            <li class="fw-bolder mb-1 mt-4">
+                                <span class="english">{{ is[2] }}</span>
+                                <span class="chinese" hidden>{{ is[3] }}</span>
+                            </li>
+                            {% endif %}
+                            <span class="english">{{ is[4] }}</span>
+                            <span class="chinese" hidden>{{ is[5] }}</span>
+                            <span>{% if is[6] %} ({{ is[6] }}){% endif %}</span>
+                            <span>, </span>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </spen>
-        </section> -->
+        </section>
 
         <section id="bankCheckBox">
             <span class="break-page"></span>

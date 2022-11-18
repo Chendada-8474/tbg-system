@@ -269,6 +269,7 @@ def trip_quote(trip_id):
     itinerary = get_one_itinerary_spot_quote(trip_id)
     itinerary_title = get_itinerary_title(trip_info[0].itinerary_id)
     accommodation = get_itinerary_accommodation(trip_info[0].itinerary_id)
+    itinerary_species = get_trip_key_species(trip_id)
     today = date.today()
 
     return render_template(
@@ -281,6 +282,7 @@ def trip_quote(trip_id):
         itinerary=itinerary,
         itinerary_title=itinerary_title,
         accommodation=accommodation,
+        itinerary_species=itinerary_species,
         today=today,
     )
 
