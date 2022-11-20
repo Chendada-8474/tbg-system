@@ -560,35 +560,35 @@
         </section>
 
         <section id="speciesCheckBox">
-            <spen class="break-page">
-                <div class="border border-secondary quote-page">
-                    <div class="text-center">
-                        <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+            <span class="break-page"></span>
+            <div class="border border-secondary quote-page">
+                <div class="text-center">
+                    <img class="tbg-logo m-2" src="{{ url_for('static', filename='img/TBGlogo.png') }}" alt="">
+                </div>
+                <div class="p-3">
+                    <div class="mb-5">
+                        <h4>
+                            <span class="english">Key Species</span>
+                            <span class="chinese" hidden>重點物種</span>
+                        </h4>
                     </div>
-                    <div class="p-3">
-                        <div class="mb-5">
-                            <h4>
-                                <span class="english">Key Species</span>
-                                <span class="chinese" hidden>重點物種</span>
-                            </h4>
-                        </div>
-                        <div class="mb-5">
-                            {% for is in itinerary_species %}
-                            {% if itinerary_species[loop.index-2][0] != is[0] %}
-                            <li class="fw-bolder mb-1 mt-4">
-                                <span class="english">{{ is[2] }}</span>
-                                <span class="chinese" hidden>{{ is[3] }}</span>
-                            </li>
-                            {% endif %}
-                            <span class="english">{{ is[4] }}</span>
-                            <span class="chinese" hidden>{{ is[5] }}</span>
-                            <span>{% if is[6] %} ({{ is[6] }}){% endif %}</span>
-                            <span>, </span>
-                            {% endfor %}
-                        </div>
+                    <div class="mb-5">
+                        {% for is in itinerary_species %}
+                        {% if itinerary_species[loop.index-2][0] != is[0] %}
+                        <li class="fw-bolder mb-1 mt-4">
+                            <span class="english">{{ is[2] }}</span>
+                            <span class="chinese" hidden>{{ is[3] }}</span>
+                        </li>
+                        {% endif %}
+                        <span class="english">{{ is[4] }}</span>
+                        <span class="chinese" hidden>{{ is[5] }}</span>
+                        <span>{% if is[6] %} ({{ is[6] }}){% endif %}</span>
+                        <span>, </span>
+                        {% endfor %}
                     </div>
                 </div>
-            </spen>
+            </div>
+
         </section>
 
         <section id="bankCheckBox">
