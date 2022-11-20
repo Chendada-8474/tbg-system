@@ -598,6 +598,7 @@ def insert_new_trip(form):
         vehicle=form.vehicle.data,
         contact_client=parti[0],
         receiving_account=form.receiving_account.data,
+        itinerary_id=form.itinerary_id.data,
         note=form.note.data,
     )
     db_session.add(new_trip)
@@ -766,6 +767,7 @@ def update_trip(trip_id, form):
             "vehicle": form.vehicle.data,
             "ebird_trip_id": form.ebird_trip_id.data,
             "receiving_account": form.receiving_account.data,
+            "itinerary_id": form.itinerary_id.data,
             "note": form.note.data,
         }
     )
