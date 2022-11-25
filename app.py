@@ -121,37 +121,37 @@ def index():
     return render_template("index.html", trip=trip, pre_form=pre_form, unshown=unshown)
 
 
-@app.route("/<int:id>", methods=["GET", "POST"])
+@app.route("/<int:trip_id>", methods=["GET", "POST"])
 @login_required
-def trip(id):
-    if id not in get_trip_id():
+def trip(trip_id):
+    if trip_id not in get_trip_id():
         return render_template("404.html")
 
-    progress = get_progress(id)
-    cancel = get_cancel(id)
+    progress = get_progress(trip_id)
+    cancel = get_cancel(trip_id)
 
     if request.method == "POST":
         if cancel == 0:
             if request.form["progress_button"] == "back":
-                update_progress(id, progress, how="back")
+                update_progress(trip_id, progress, how="back")
             elif request.form["progress_button"] == "next":
-                update_progress(id, progress, how="next")
+                update_progress(trip_id, progress, how="next")
         if progress[3] == 0:
             if request.form["progress_button"] == "cancel":
-                update_progress(id, progress, how="cancel")
-                cancel = get_cancel(id)
+                update_progress(trip_id, progress, how="cancel")
+                cancel = get_cancel(trip_id)
             elif request.form["progress_button"] == "uncancel":
-                update_progress(id, progress, how="uncancel")
-                cancel = get_cancel(id)
+                update_progress(trip_id, progress, how="uncancel")
+                cancel = get_cancel(trip_id)
 
-    trip_info = get_trip_info(id)
-    crew = get_trip_partner(id)
-    parti = get_trip_parti(id)
-    expend = get_expenditure_of_trip(id)
+    trip_info = get_trip_info(trip_id)
+    crew = get_trip_partner(trip_id)
+    parti = get_trip_parti(trip_id)
+    expend = get_expenditure_of_trip(trip_id)
 
-    itin = get_one_itinerary_spot(trip_info[0].itinerary_id)
-    itin_title = get_itinerary_title(trip_info[0].itinerary_id)
-    accom = get_itinerary_accommodation(trip_info[0].itinerary_id)
+    itinerary = get_one_itinerary_spot_quote(trip_id)
+    itinerary_title = get_itinerary_title(trip_info[0].itinerary_id)
+    accommodation = get_itinerary_accommodation(trip_info[0].itinerary_id)
 
     is_twd = True if trip_info[0].currency == "TWD" else False
 
@@ -164,13 +164,13 @@ def trip(id):
         parti=parti,
         expend=expend,
         cancel=cancel,
-        trip_id=id,
+        trip_id=trip_id,
         is_twd=is_twd,
         total_expand=total_expand,
         profit=profit,
-        itin=itin,
-        itin_title=itin_title,
-        accom=accom,
+        itinerary=itinerary,
+        itinerary_title=itinerary_title,
+        accommodation=accommodation,
     )
 
 

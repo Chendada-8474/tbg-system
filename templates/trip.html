@@ -324,26 +324,32 @@
         </div>
     </div>
 
-    <div class="row pt-1 pb-2 mb-3{% if itin_title.invalid %} opacity-50{% endif %}">
+    <div class="row pt-1 pb-2 mb-3">
         <div class="col-lg-12">
             <div class="shadow-sm bg-light p-3 rounded-2 h-100">
                 <h3 class="mb-3">Itinerary</h3>
-
-                {% for i in itin %}
-                {% if i[0].schedule == 1 %}
-                <h5 id="day{{ i[0].day }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">Day {{ i[0].day }}</h5>
-
-                <hr>
+                {% for i in itinerary %}
+                {% if i[1] == 1 %}
+                <h6 id="day{{ i[0] }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">
+                    <span class="pe-1">{{ i[7] }}</span>
+                    <span class="pe-1">{{ i[8] }}</span>
+                    <span class="pe-1">Day {{ i[0] }}</span>
+                </h6>
                 {% endif %}
-                <li class="fw-bolder mb-2">{{ i[1].spot_name }} - {{ i[1].spot_ch_name }}</li>
-                <p>{{ i[1].description }}</p>
+                <li class="fw-bolder mb-1">
+                    <span class="english">{{ i[3] }}</span>
+                </li>
+
+                <div class="english" id="description{{ i[0] }}-{{ i[2] }}">
+                    <p>{{ i[5] }}</p>
+                </div>
                 {% endfor %}
 
             </div>
         </div>
     </div>
 
-    <div class="row pt-1 pb-2 mb-3{% if itin_title.invalid %} opacity-50{% endif %}">
+    <div class="row pt-1 pb-2 mb-3">
         <div class="col-lg-12">
             <div class="shadow-sm bg-light p-3 rounded-2">
                 <h4>Accommodation</h4>
@@ -360,7 +366,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for a in accom %}
+                        {% for a in accommodation %}
                         <tr>
                             <td>day {{ a[0].day }}</td>
                             <td>{{ a[1].accommodation_ch_name }}<br>{{ a[1].accommodation_name }}</td>
