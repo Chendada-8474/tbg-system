@@ -149,6 +149,10 @@ def trip(id):
     parti = get_trip_parti(id)
     expend = get_expenditure_of_trip(id)
 
+    itin = get_one_itinerary_spot(trip_info[0].itinerary_id)
+    itin_title = get_itinerary_title(trip_info[0].itinerary_id)
+    accom = get_itinerary_accommodation(trip_info[0].itinerary_id)
+
     is_twd = True if trip_info[0].currency == "TWD" else False
 
     total_expand, profit = expenditure_summary(expend, trip_info)
@@ -164,6 +168,9 @@ def trip(id):
         is_twd=is_twd,
         total_expand=total_expand,
         profit=profit,
+        itin=itin,
+        itin_title=itin_title,
+        accom=accom,
     )
 
 

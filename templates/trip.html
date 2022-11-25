@@ -214,108 +214,171 @@
     </div>
 
     <div class="row pt-3 pb-2 mb-3">
-        <div class="shadow-sm bg-light p-3">
-            <div class="d-flex flex-wrap justify-content-between">
-                <h4 class="pb-3">Participating Customer</h4>
-                <a href="/{{trip_id}}/customer"><button type="button" class="btn btn-primary"><span data-feather="users" class="align-text-bottom"></span> 顧客詳細資訊</button></a>
+        <div class="col-lg-12">
+            <div class="shadow-sm bg-light p-3">
+                <div class="d-flex flex-wrap justify-content-between">
+                    <h4 class="pb-3">Participating Customer</h4>
+                    <a href="/{{trip_id}}/customer"><button type="button" class="btn btn-primary"><span data-feather="users" class="align-text-bottom"></span> 顧客詳細資訊</button></a>
+                </div>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Gender</th>
+                            <th scope="col">Age</th>
+                            <th scope="col">Country</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in parti %}
+                        <tr>
+                            <th scope="row">{{p[0]}}</th>
+                            <td>{{p[1]}}</td>
+                            <td>{{p[2]}}</td>
+                            <td>{{p[3]}}</td>
+                            <td>{{p[4]}}</td>
+                            <td class="text-center">
+                                <a href="/edit-customer/{{ p[0] }}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Gender</th>
-                        <th scope="col">Age</th>
-                        <th scope="col">Country</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in parti %}
-                    <tr>
-                        <th scope="row">{{p[0]}}</th>
-                        <td>{{p[1]}}</td>
-                        <td>{{p[2]}}</td>
-                        <td>{{p[3]}}</td>
-                        <td>{{p[4]}}</td>
-                        <td class="text-center">
-                            <a href="/edit-customer/{{ p[0] }}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
     </div>
 
     <div class="row pt-3 pb-2 mb-3">
-        <div class="shadow-sm bg-light p-3">
-            <div class="d-flex flex-wrap justify-content-between">
-                <h4 class="pb-3">支出明細表</h4>
-                <div>
-                    <a class="mx-1" href="/{{trip_id}}/new-expenditure"><button type="button" class="btn btn-primary"><span data-feather="file-plus" class="align-text-bottom"></span> 增加項目</button></a>
-                    <button onclick="download()" class="btn btn-success mx-1">下載支出表</button>
+        <div class="col-lg-12">
+            <div class="shadow-sm bg-light p-3">
+                <div class="d-flex flex-wrap justify-content-between">
+                    <h4 class="pb-3">支出明細表</h4>
+                    <div>
+                        <a class="mx-1" href="/{{trip_id}}/new-expenditure"><button type="button" class="btn btn-primary"><span data-feather="file-plus" class="align-text-bottom"></span> 增加項目</button></a>
+                        <button onclick="download()" class="btn btn-success mx-1">下載支出表</button>
+                    </div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="noteShow">
+                    <label class="form-check-label" for="noteShow">顯示備註</label>
+                </div>
+                <table id="expenditure" class="table table-striped table-hover mb-3 sortable">
+                    <thead>
+                        <tr>
+                            <th class="exp-index" scope="col">#</th>
+                            <th class="no-sort" scope="col">項目</th>
+                            <th scope="col">單價</th>
+                            <th class="no-sort" scope="col">數量</th>
+                            <th scope="col">總價</th>
+                            <th scope="col">日期</th>
+                            <th class="no-sort" scope="col">代墊人</th>
+                            <th class="no-sort" scope="col">收據</th>
+                            <th class="no-sort" scope="col">
+                                備註
+                            </th>
+                            <th class="no-sort" class="edit-exp" scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in expend %}
+                        <tr>
+                            <td class="exp-index" scope="row">{{ e[0].expenditure_id }}</td>
+                            <td>{{ e[1].item_name }}</td>
+                            <td>{{ e[0].unit_price }}</td>
+                            <td>{{ e[0].quantity }}</td>
+                            <td>{{ e[0].quantity * e[0].unit_price }}</td>
+                            <td>{{ e[0].date }}</td>
+                            <td>{{ e[2].ch_last_name }}{{e[2].ch_first_name}}</td>
+                            <td>
+                                {% if e[0].receipt == 1 %}
+                                <span data-feather="check" class="align-text-bottom"></span>
+                                <span hidden>v</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="show-note" hidden>{{ e[0].note }}</span>
+                                <span class="hide-note">...</span>
+
+                            </td>
+                            <td class="text-center edit-exp">
+                                <a href="/{{trip_id}}/edit-expenditure/{{e[0].expenditure_id}}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="d-flex flex-wrap">
+
+                    {% if profit %}
+                    <h5 class="m-3">總支出: <span>{{total_expand}} TWD</span></h5>
+                    <h5 class="m-3">利潤: <span class="{% if profit > 0 %}text-success{% elif profit < 0 %}text-danger{% else %}text-warning{% endif %}">{{profit}} TWD</span></h5>
+                    {% else %}
+                    <p>尚未輸入匯率</p>
+                    {% endif %}
+
                 </div>
             </div>
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" role="switch" id="noteShow">
-                <label class="form-check-label" for="noteShow">顯示備註</label>
-            </div>
-            <table id="expenditure" class="table table-striped table-hover mb-3 sortable">
-                <thead>
-                    <tr>
-                        <th class="exp-index" scope="col">#</th>
-                        <th class="no-sort" scope="col">項目</th>
-                        <th scope="col">單價</th>
-                        <th class="no-sort" scope="col">數量</th>
-                        <th scope="col">總價</th>
-                        <th scope="col">日期</th>
-                        <th class="no-sort" scope="col">代墊人</th>
-                        <th class="no-sort" scope="col">收據</th>
-                        <th class="no-sort" scope="col">
-                            備註
-                        </th>
-                        <th class="no-sort" class="edit-exp" scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for e in expend %}
-                    <tr>
-                        <td class="exp-index" scope="row">{{ e[0].expenditure_id }}</td>
-                        <td>{{ e[1].item_name }}</td>
-                        <td>{{ e[0].unit_price }}</td>
-                        <td>{{ e[0].quantity }}</td>
-                        <td>{{ e[0].quantity * e[0].unit_price }}</td>
-                        <td>{{ e[0].date }}</td>
-                        <td>{{ e[2].ch_last_name }}{{e[2].ch_first_name}}</td>
-                        <td>
-                            {% if e[0].receipt == 1 %}
-                            <span data-feather="check" class="align-text-bottom"></span>
-                            <span hidden>v</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="show-note" hidden>{{ e[0].note }}</span>
-                            <span class="hide-note">...</span>
+        </div>
+    </div>
 
-                        </td>
-                        <td class="text-center edit-exp">
-                            <a href="/{{trip_id}}/edit-expenditure/{{e[0].expenditure_id}}"><span data-feather="edit" class="align-text-bottom"></span> 編輯</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="row pt-1 pb-2 mb-3{% if itin_title.invalid %} opacity-50{% endif %}">
+        <div class="col-lg-12">
+            <div class="shadow-sm bg-light p-3 rounded-2 h-100">
+                <h3 class="mb-3">Itinerary</h3>
 
-            <div class="d-flex flex-wrap">
+                {% for i in itin %}
+                {% if i[0].schedule == 1 %}
+                <h5 id="day{{ i[0].day }}" class="{% if loop.index != 1 %}mt-5{% endif %} fw-bolder text-secondary">Day {{ i[0].day }}</h5>
 
-                {% if profit %}
-                <h5 class="m-3">總支出: <span>{{total_expand}} TWD</span></h5>
-                <h5 class="m-3">利潤: <span class="{% if profit > 0 %}text-success{% elif profit < 0 %}text-danger{% else %}text-warning{% endif %}">{{profit}} TWD</span></h5>
-                {% else %}
-                <p>尚未輸入匯率</p>
+                <hr>
                 {% endif %}
+                <li class="fw-bolder mb-2">{{ i[1].spot_name }} - {{ i[1].spot_ch_name }}</li>
+                <p>{{ i[1].description }}</p>
+                {% endfor %}
 
+            </div>
+        </div>
+    </div>
+
+    <div class="row pt-1 pb-2 mb-3{% if itin_title.invalid %} opacity-50{% endif %}">
+        <div class="col-lg-12">
+            <div class="shadow-sm bg-light p-3 rounded-2">
+                <h4>Accommodation</h4>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>住宿</th>
+                            <th>地址</th>
+                            <th>電話</th>
+                            <th>wifi</th>
+                            <th>海拔</th>
+                            <th>備註</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in accom %}
+                        <tr>
+                            <td>day {{ a[0].day }}</td>
+                            <td>{{ a[1].accommodation_ch_name }}<br>{{ a[1].accommodation_name }}</td>
+                            <td>{{ a[1].ch_address }}<br>{{ a[1].address }}</td>
+                            <td>{{ a[1].phone_number }}</td>
+                            <td>
+                                {% if a[1].wifi == 1 %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
+                            <td>{{ a[1].elevation }}</td>
+                            <td>{{ a[1].note }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
