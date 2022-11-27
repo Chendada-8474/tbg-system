@@ -582,9 +582,6 @@ def itinerary_info(itin_id):
 @app.route("/new-itinerary", methods=["GET", "POST"])
 @login_required
 def new_itinerary():
-    global spot_for_live, accommodation_for_live
-    spot_for_live = get_spot()
-    accommodation_for_live = get_accommodation_live()
     spot_type_selction = get_spot_type_selection()
     county_selction = get_county_selection()
     inserted = False
@@ -618,6 +615,7 @@ def new_itinerary():
 @app.route("/live-spot", methods=["GET", "POST"])
 @login_required
 def live_spot():
+    spot_for_live = get_spot()
     response_filter = request.get_json("live_spot")
     filted_spot_table = filt_spot_by_type_county(spot_for_live, response_filter)
     return jsonify(filted_spot_table)
@@ -627,6 +625,7 @@ def live_spot():
 @login_required
 def live_accommodation():
     response_filter = request.get_json("live-accommodation")
+    accommodation_for_live = get_accommodation_live()
     filted_accommodation = filt_accommodation_by_county(
         accommodation_for_live, response_filter
     )
@@ -636,7 +635,6 @@ def live_accommodation():
 @app.route("/edit-itinerary/<int:itin_id>", methods=["GET", "POST"])
 @login_required
 def edit_itinerary(itin_id):
-    global spot_for_live, accommodation_for_live
 
     inserted = False
     if request.method == "POST":
@@ -656,8 +654,6 @@ def edit_itinerary(itin_id):
             update_an_itinerary(itin_id, new_itinerary_dict)
             inserted = True
 
-    spot_for_live = get_spot()
-    accommodation_for_live = get_accommodation_live()
     spot_type_selction = get_spot_type_selection()
     county_selction = get_county_selection()
 
