@@ -209,7 +209,6 @@ def get_trip_info(id):
 
 def get_one_trip(id):
     trip_info = db_session.query(Trip).filter(Trip.trip_id == id).first()
-
     return trip_info
 
 
@@ -739,38 +738,71 @@ def insert_customer(cus_form, trip_id: int):
 
 
 def update_trip(trip_id, form):
-    db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
-        {
-            "starting_date": form.starting_date.data,
-            "number_of_days": form.number_of_days.data,
-            "cost": form.cost.data,
-            "deposit_amount": form.deposit_amount.data,
-            "deposit_date": form.deposit_date.data,
-            "currency": form.currency.data,
-            "exchange_rate": form.exchange_rate.data,
-            "pick_up_time": form.pick_up_time.data,
-            "pick_up_location": form.pick_up_location.data,
-            "end_time": form.end_time.data,
-            "end_location": form.end_location.data,
-            "guide": form.guide.data,
-            "driver": form.driver.data,
-            "manager": form.manager.data,
-            "sales": form.sales.data,
-            "accountant": form.accountant.data,
-            "route_control": form.route_control.data,
-            "single_room": form.single_room.data,
-            "twin_room": form.twin_room.data,
-            "double_room": form.double_room.data,
-            "triple_room": form.triple_room.data,
-            "quadruple_room": form.quadruple_room.data,
-            "other_room": form.other_room.data,
-            "vehicle": form.vehicle.data,
-            "ebird_trip_id": form.ebird_trip_id.data,
-            "receiving_account": form.receiving_account.data,
-            "itinerary_id": form.itinerary_id.data,
-            "note": form.note.data,
-        }
-    )
+    if form.itinerary_id.data:
+        db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
+            {
+                "starting_date": form.starting_date.data,
+                "number_of_days": form.number_of_days.data,
+                "cost": form.cost.data,
+                "deposit_amount": form.deposit_amount.data,
+                "deposit_date": form.deposit_date.data,
+                "currency": form.currency.data,
+                "exchange_rate": form.exchange_rate.data,
+                "pick_up_time": form.pick_up_time.data,
+                "pick_up_location": form.pick_up_location.data,
+                "end_time": form.end_time.data,
+                "end_location": form.end_location.data,
+                "guide": form.guide.data,
+                "driver": form.driver.data,
+                "manager": form.manager.data,
+                "sales": form.sales.data,
+                "accountant": form.accountant.data,
+                "route_control": form.route_control.data,
+                "single_room": form.single_room.data,
+                "twin_room": form.twin_room.data,
+                "double_room": form.double_room.data,
+                "triple_room": form.triple_room.data,
+                "quadruple_room": form.quadruple_room.data,
+                "other_room": form.other_room.data,
+                "vehicle": form.vehicle.data,
+                "ebird_trip_id": form.ebird_trip_id.data,
+                "receiving_account": form.receiving_account.data,
+                "itinerary_id": form.itinerary_id.data,
+                "note": form.note.data,
+            }
+        )
+    else:
+        db_session.query(Trip).filter(Trip.trip_id == trip_id).update(
+            {
+                "starting_date": form.starting_date.data,
+                "number_of_days": form.number_of_days.data,
+                "cost": form.cost.data,
+                "deposit_amount": form.deposit_amount.data,
+                "deposit_date": form.deposit_date.data,
+                "currency": form.currency.data,
+                "exchange_rate": form.exchange_rate.data,
+                "pick_up_time": form.pick_up_time.data,
+                "pick_up_location": form.pick_up_location.data,
+                "end_time": form.end_time.data,
+                "end_location": form.end_location.data,
+                "guide": form.guide.data,
+                "driver": form.driver.data,
+                "manager": form.manager.data,
+                "sales": form.sales.data,
+                "accountant": form.accountant.data,
+                "route_control": form.route_control.data,
+                "single_room": form.single_room.data,
+                "twin_room": form.twin_room.data,
+                "double_room": form.double_room.data,
+                "triple_room": form.triple_room.data,
+                "quadruple_room": form.quadruple_room.data,
+                "other_room": form.other_room.data,
+                "vehicle": form.vehicle.data,
+                "ebird_trip_id": form.ebird_trip_id.data,
+                "receiving_account": form.receiving_account.data,
+                "note": form.note.data,
+            }
+        )
     db_session.commit()
 
 

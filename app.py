@@ -86,7 +86,6 @@ def login():
         if user_login in users and check_password_hash(
             users[user_login]["password"], request.form["password"]
         ):
-            print(True)
             user = LoginUser()
             user.id = user_login
             login_user(user)
@@ -641,9 +640,6 @@ def edit_itinerary(itin_id):
         if request.form["submit_buttom"] == "update_itinerary":
             english_title = request.form.get("english_title")
             chinese_title = request.form.get("chinese_title")
-            print(request.form.getlist("spot_id"))
-            print(request.form.getlist("number_of_schedule"))
-            print(request.form.getlist("accommodation_id"))
             new_itinerary_dict = organize_itinerary_to_dict(
                 request.form.getlist("spot_id"),
                 request.form.getlist("number_of_schedule"),
@@ -855,10 +851,10 @@ def page_not_found(e):
     return render_template("404.html", err=e), 404
 
 
-@app.errorhandler(Exception)
-def internal_error(error):
-    bot.send_message(ADMIN_CHAT_ID, text=abort_msg(error))
-    return render_template("error.html", error=error)
+# @app.errorhandler(Exception)
+# def internal_error(error):
+#     bot.send_message(ADMIN_CHAT_ID, text=abort_msg(error))
+#     return render_template("error.html", error=error)
 
 
 if __name__ == "__main__":

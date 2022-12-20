@@ -189,7 +189,7 @@ def update_trip_form(
     sales_def=1,
     accountant_def=3,
     route_control_def=1,
-    itinerary_def="",
+    itinerary_def=0,
 ):
 
     partners = get_partner_selection()
